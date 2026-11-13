@@ -201,9 +201,21 @@ button.row:active{background:var(--s2)}
 .field{width:100%;background:var(--s2);color:var(--tx);border:0;border-radius:12px;padding:12px 14px;font:inherit;font-size:17px;outline:none}
 textarea.field{min-height:84px;resize:vertical}
 .field::placeholder{color:var(--tx3)}
-#greet{margin:-6px 0 16px}
-#greet b{display:block;font-size:20px;font-weight:600;letter-spacing:-.01em}
-#greet span{display:block;margin-top:4px;font-size:15px;line-height:1.35;color:var(--tx2)}
+#greet{margin:6px 0 18px;padding-top:4px}
+#greet .gi{display:block;font-size:34px;line-height:1;height:40px;transform-origin:50% 80%;animation:bob 5s ease-in-out infinite}
+#greet b{display:block;margin-top:10px;font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.02em}
+#greet b em{font-style:normal;color:var(--acc);transition:color .6s}
+#greet span.q{display:block;margin-top:8px;font-size:16px;line-height:1.4;color:var(--tx2);max-width:92%}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes pop{0%{opacity:0;transform:scale(.4) rotate(-20deg)}100%{opacity:1;transform:none}}
+@keyframes rise{0%{opacity:0;transform:translateY(14px);filter:blur(6px)}100%{opacity:1;transform:none;filter:none}}
+@keyframes breathe{0%,100%{opacity:.7}50%{opacity:1}}
+body::before{animation:breathe 7s ease-in-out infinite}
+#vCyc.enter #greet .gi{animation:pop .8s cubic-bezier(.34,1.56,.64,1) backwards,bob 5s 1s ease-in-out infinite}
+#vCyc.enter #greet b{animation:rise .8s .15s cubic-bezier(.2,.8,.2,1) backwards}
+#vCyc.enter #greet span.q{animation:rise .9s .45s cubic-bezier(.2,.8,.2,1) backwards}
+#vCyc.enter #cyc{animation:rise 1s .7s cubic-bezier(.2,.8,.2,1) backwards}
+@media (prefers-reduced-motion:reduce){#greet .gi,body::before{animation:none!important}#vCyc.enter #greet b,#vCyc.enter #greet span.q,#vCyc.enter #cyc{animation:none!important}}
 .row input[type=text]{width:55%;text-align:right;background:transparent;color:var(--tx);border:0;font:inherit;font-size:17px;outline:none}
 .row input[type=text]::placeholder{color:var(--tx3)}
 .row input[type=date],.row select{background:var(--s2);color:var(--tx);border:0;border-radius:8px;padding:6px 10px;font:inherit;font-size:16px}
@@ -239,7 +251,6 @@ textarea.field{min-height:84px;resize:vertical}
 <body>
 
 <section class="view on" id="vCyc">
-  <h1 data-t="cycle"></h1>
   <div id="greet"></div>
   <div id="cyc"></div>
 </section>
@@ -339,7 +350,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r16';
+const BUILD='r17';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -877,12 +888,13 @@ $('langSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(
 /* ---------- Begrüßung ---------- */
 const QUOTES={de:["Multitasking ist nur ein schickes Wort für: Ich vergesse mehrere Dinge gleichzeitig.", "Kaffee ist kein Getränk. Kaffee ist eine Betriebsvoraussetzung.", "Der Montag kann nichts dafür. Er ist nur der Überbringer.", "Sei freundlich zu dir. Du hörst dir den ganzen Tag zu.", "Ich habe keine Prokrastination. Ich habe Prioritäten mit Verzögerung.", "Heute schon etwas Sinnvolles getan? Atmen zählt.", "Mein Körper ist ein Tempel. Leider einer mit wechselnden Öffnungszeiten.", "Schokolade ist kein Snack. Es ist Medizin mit Geschmack.", "Der Plan war gut. Dann kam der Tag.", "Du musst nicht alles schaffen. Nur das, was nach Feierabend noch brennt.", "Ein Tag ohne Sofa ist ein verlorener Tag.", "Wer früh aufsteht, hat mehr vom Tag. Und mehr Müdigkeit davon.", "Manche Tage laufen. Andere werden getragen. Heute wird gekrabbelt, und das ist okay.", "Ich bin nicht zickig. Ich bin hormonell gut informiert.", "Das Leben ist kurz. Iss das gute Eis zuerst.", "Perfekt ist langweilig. Du bist mindestens interessant.", "Fünf Minuten Pause sind auch ein Fortschritt.", "Mein Akku hat zwei Modi: 100 % und Decke über den Kopf.", "Nein ist ein vollständiger Satz. Ein sehr schöner sogar.", "Heute ist ein guter Tag, um Dinge auf morgen zu verschieben, die man gestern vergessen hat.", "Wasser trinken, Schultern runter, weitermachen. Mehr Weisheit gibt es nicht.", "Du bist kein Roboter. Auch wenn der Kalender das glaubt.", "Gute Laune ist auch nur schlechte Laune mit Frühstück.", "Wenn alles schiefgeht, gibt es immer noch Snacks."],
 ru:["Многозадачность — это красивое слово для «я забываю сразу несколько вещей».", "Кофе — не напиток. Кофе — условие работы.", "Понедельник ни при чём. Он просто принёс новости.", "Будь добра к себе. Ты слушаешь себя весь день.", "У меня нет прокрастинации. У меня приоритеты с задержкой.", "Сделала сегодня что-то полезное? Дыхание тоже считается.", "Моё тело — храм. Просто у него плавающий график.", "Шоколад — не перекус. Это лекарство со вкусом.", "План был хороший. Потом наступил день.", "Не надо успевать всё. Только то, что горит после работы.", "День без дивана — потерянный день.", "Кто рано встаёт, тому больше дня. И больше усталости.", "Одни дни бегут, другие несут. Сегодня ползём, и это нормально.", "Я не вредная. Я гормонально информирована.", "Жизнь коротка. Сначала ешь вкусное мороженое.", "Идеальное — скучно. Ты как минимум интересная.", "Пять минут паузы — тоже прогресс.", "У моей батарейки два режима: 100 % и плед на голову.", "«Нет» — законченное предложение. Очень красивое, кстати.", "Сегодня хороший день, чтобы отложить на завтра то, что забыла вчера.", "Попить воды, опустить плечи, идти дальше. Другой мудрости нет.", "Ты не робот. Даже если календарь думает иначе.", "Хорошее настроение — это плохое настроение после завтрака.", "Если всё идёт не так, всегда остаются вкусняшки."]};
-const GREET={de:['Guten Morgen','Guten Tag','Guten Abend','Hallo Nachteule'],ru:['Доброе утро','Добрый день','Добрый вечер','Доброй ночи']};
-function renderGreet(){
+const GREET={de:['Guten Morgen','Guten Tag','Guten Abend','Hallo Nachteule'],ru:['Доброе утро','Добрый день','Добрый вечер','Доброй ночи']},GEMO=['☕','🌿','🕯️','🌙'];
+function renderGreet(play){
   const n=new Date(),h=n.getHours(),g=GREET[lang],i=h>=5&&h<11?0:h>=11&&h<17?1:h>=17&&h<23?2:3;
   const name=(store.get('name')||'').trim();
   const pool=QUOTES[lang],q=pool[Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/864e5)%pool.length];
-  $('greet').innerHTML='<b>'+esc(g[i]+(name?', '+name:''))+'</b><span>'+esc(q)+'</span>';
+  $('greet').innerHTML='<span class="gi">'+GEMO[i]+'</span><b>'+esc(g[i])+(name?', <em>'+esc(name)+'</em>':'')+'</b><span class="q">'+esc(q)+'</span>';
+  const v=$('vCyc');v.classList.remove('enter');if(play){void v.offsetWidth;v.classList.add('enter')}
 }
 $('nameIn').value=store.get('name')||'';
 $('nameIn').addEventListener('input',e=>{store.set('name',e.target.value.trim());renderGreet()});
@@ -978,7 +990,7 @@ async function checkUpdate(){
   }catch(e){}
 }
 $('upd').onclick=()=>{location.href=location.pathname+'?v='+encodeURIComponent(updTo||Date.now())};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkUpdate();renderGreet()}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkUpdate();renderGreet(true)}});
 
 /* ---------- Start ---------- */
 (async()=>{
@@ -987,6 +999,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkUpda
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   calSel=iso(new Date());
   applyLang();
+  renderGreet(true);
   $('verNote').textContent='Version '+BUILD;
   setTimeout(checkUpdate,1500);
 })();
