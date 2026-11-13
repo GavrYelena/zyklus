@@ -43,6 +43,14 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .day .c{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;position:relative;transition:transform .1s ease-out}
 .day:active .c{transform:scale(.9)}
 .day.fut{color:var(--tx3)}
+.day.sel .c{outline:2px solid var(--acc);outline-offset:2px}
+.phd{display:flex;justify-content:space-between;align-items:baseline;margin:18px 16px 8px}
+.phd b{font-size:17px;font-weight:600}
+.phd button{color:var(--acc);font-weight:600;padding:4px 0 4px 12px}
+.prev .row{min-height:48px;padding:10px 16px}
+.info.prev .lt small{white-space:normal;font-size:15px;line-height:1.35;color:var(--tx);margin-top:2px;overflow-wrap:anywhere}
+.prev .rt b{font-weight:500;font-size:16px}
+.prev .empty{padding:16px;text-align:center;color:var(--tx2);font-size:15px}
 .day .ap{position:absolute;top:3px;right:calc(50% - 22px);width:7px;height:7px;border-radius:2px;background:var(--blue)}
 .day.today .c{box-shadow:inset 0 0 0 2px var(--tx)}
 .day.f1 .c{background:rgba(255,55,95,.35)}
@@ -208,6 +216,7 @@ textarea.field{min-height:84px;resize:vertical}
   </div>
   <div class="wd" id="wd"></div>
   <div class="grid" id="grid"></div>
+  <div id="dayPrev"></div>
   <div class="legend" id="legend"></div>
   <button class="todaybtn" id="todayBtn"></button>
 </section>
@@ -289,7 +298,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r10';
+const BUILD='r11';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -334,7 +343,7 @@ de:{
  h_pmsSoft:'PMS im Anmarsch',f_pmsSoft:'Die Zündschnur wird kürzer. Snacks bereitlegen.',
  h_pms:'PMS',f_pms:'Dünnes Nervenkostüm. Wer dich jetzt ärgert, ist selbst schuld.',
  h_late:'{n} Tage drüber',f_late:'Die Periode lässt auf sich warten. Abwarten – oder abklären lassen.',
- updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
+ prevEdit:'Bearbeiten',prevEmpty:'Nichts eingetragen',prevFc:'Prognose',updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
  s_period:'🫖 Periode, Tag {n}. Schonmodus an. Wärmflasche und Verständnis bitte.',s_rise:'🌱 Aufwärtsphase. Energie ist zurück, Pläne willkommen.',s_fertile:'✨ Fruchtbares Fenster. Hoch-Phase, ich strahle.',s_ov:'💫 Eisprung-Tag. Peak. Staunen erlaubt.',s_luteal:'🛋️ Ruhige Phase. Sofa schlägt Party.',s_pmsSoft:'🍫 PMS im Anmarsch. Snacks bereitlegen, die Zündschnur wird kürzer.',s_pms:'⚡ PMS. Dünnes Nervenkostüm. Wer mich jetzt ärgert, ist selbst schuld.',s_late:'⏳ Die Periode ist {n} Tage drüber.',
  cycle:'Zyklus',dayShort:'Tag',todayDate:'Heute, {d}',sub:'Zykluslänge ca. {a} Tage',legFert:'Fruchtbar',stPeriod:'Periode, Tag {n}',stOv:'Eisprung heute (geschätzt)',stFertile:'Fruchtbares Fenster',stBeforeFert:'Fruchtbares Fenster {r}',stAfter:'Periode {r}',stLate:'Periode {n} Tage überfällig',cycleDay:'Zyklustag',ofAbout:'von ca. {n}',nextPeriod:'Nächste Periode',ovulation:'Eisprung',
  inDays:'in {n} Tagen',tomorrow:'morgen',todayW:'heute',late:'{n} Tage drüber',lateOne:'1 Tag drüber',ovPast:'vorbei',
@@ -381,7 +390,7 @@ ru:{
  h_pmsSoft:'ПМС на подходе',f_pmsSoft:'Фитиль становится короче. Запасись вкусняшками.',
  h_pms:'ПМС',f_pms:'Нервы на пределе. Кто сейчас злит – сам виноват.',
  h_late:'Задержка {n} дн.',f_late:'Месячные задерживаются. Подождать – или проверить.',
- updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
+ prevEdit:'Изменить',prevEmpty:'Ничего не записано',prevFc:'Прогноз',updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
  s_period:'🫖 Месячные, день {n}. Режим экономии. Грелку и понимание, пожалуйста.',s_rise:'🌱 Подъём. Энергия вернулась, планы приветствуются.',s_fertile:'✨ Фертильное окно. Пик формы, я сияю.',s_ov:'💫 День овуляции. Пик. Восхищаться разрешено.',s_luteal:'🛋️ Спокойная фаза. Диван лучше вечеринки.',s_pmsSoft:'🍫 ПМС на подходе. Запасай вкусняшки, фитиль становится короче.',s_pms:'⚡ ПМС. Нервы на пределе. Кто меня сейчас злит – сам виноват.',s_late:'⏳ Задержка {n} дн.',
  cycle:'Цикл',dayShort:'День',todayDate:'Сегодня, {d}',sub:'Длина цикла ~{a} дн.',legFert:'Фертильность',stPeriod:'Месячные, день {n}',stOv:'Овуляция сегодня (прогноз)',stFertile:'Фертильное окно',stBeforeFert:'Фертильное окно {r}',stAfter:'Месячные {r}',stLate:'Задержка {n} дн.',cycleDay:'День цикла',ofAbout:'из ~{n}',nextPeriod:'Следующие месячные',ovulation:'Овуляция',
  inDays:'через {n} дн.',tomorrow:'завтра',todayW:'сегодня',late:'задержка {n} дн.',lateOne:'задержка 1 день',ovPast:'прошла',
@@ -627,6 +636,7 @@ function refresh(){renderCycle();renderCal();renderStats();renderAnalysis()}
 
 /* ---------- Kalender ---------- */
 const view=new Date();view.setDate(1);
+let calSel=null,calPred=new Map();
 function renderCal(){
   const pred=new Map();
   if(fc){const A=fc.avg,ovd=A-13;
@@ -634,6 +644,7 @@ function renderCal(){
       for(let d=1;d<=A;d++){const ds=addDays(st,d-1);if(ds<fc.today)continue;let ph=null;
         if(d<=pe)ph='pp';else if(d===ovd)ph='po';else if(d>=ovd-5&&d<=ovd+1)ph='pf';else if(d>A-7)ph='ps';
         if(ph)pred.set(ds,ph)}}}
+  calPred=pred;
   const title=new Intl.DateTimeFormat(lang,{month:'long',year:'numeric'}).format(view);
   $('mTitle').textContent=title.charAt(0).toUpperCase()+title.slice(1);
   $('wd').innerHTML=[...Array(7)].map((_,i)=>'<div>'+new Intl.DateTimeFormat(lang,{weekday:'narrow'}).format(new Date(2024,0,1+i))+'</div>').join('');
@@ -642,17 +653,38 @@ function renderCal(){
   let h='';for(let i=0;i<off;i++)h+='<div></div>';
   for(let d=1;d<=n;d++){
     const s=y+'-'+pad(m+1)+'-'+pad(d),r=mem.get(s);let c='day';
-    if(s===today)c+=' today';if(s>today)c+=' fut';
+    if(s===today)c+=' today';if(s>today)c+=' fut';if(s===calSel)c+=' sel';
     if(r){if(r.flow)c+=' f'+(FLOWS.indexOf(r.flow)+1);if(r.spotting&&!r.flow)c+=' sp';}
     if(!(r&&r.flow)&&pred.has(s))c+=' '+pred.get(s);
     h+='<button class="'+c+'" data-d="'+s+'"><span class="c">'+d+'</span>'+(r&&r.moods&&r.moods.length?'<i class="mk"></i>':'')+(r&&r.appt?'<i class="ap"></i>':'')+'</button>';
   }
   $('grid').innerHTML=h;
+  renderPrev();
 }
-$('grid').addEventListener('click',e=>{const b=e.target.closest('.day');if(b)openSheet(b.dataset.d)});
+function renderPrev(){
+  const el=$('dayPrev');if(!calSel){el.innerHTML='';return}
+  const r=getDay(calSel),rows=[];
+  const row=(k,v)=>rows.push('<div class="row"><span class="lt">'+k+'</span><span class="rt"><b>'+v+'</b></span></div>');
+  const fcMap={pp:t('legP'),pf:t('legFert'),po:t('legO'),ps:'PMS'};
+  if(!(r.flow)&&calPred.has(calSel))row(t('prevFc'),fcMap[calPred.get(calSel)]);
+  if(r.flow)row(t('bleeding'),t(r.flow));else if(r.spotting)row(t('bleeding'),t('spotting'));
+  if(r.flow&&r.spotting)row(t('spotting'),'✓');
+  if(r.moods.length)row(t('mood'),r.moods.map(label).join(', '));
+  if(r.pain.length)row(t('pain'),r.pain.map(label).join(', '));
+  if(r.energy)row(t('energy'),t(r.energy));
+  if(r.libido)row(t('libido'),t(r.libido));
+  if(r.sex)row(t('sex'),t(r.sex==='none'?'sexNone':r.sex));
+  if(r.appt)row(t('appt'),esc(r.appt));
+  if(r.note)rows.push('<div class="row"><span class="lt">'+t('note')+'<small>'+esc(r.note)+'</small></span></div>');
+  const dt=fmt(calSel,{weekday:'long',day:'numeric',month:'long'});
+  el.innerHTML='<div class="phd"><b>'+dt.charAt(0).toUpperCase()+dt.slice(1)+'</b><button id="prevEdit">'+t('prevEdit')+'</button></div>'+
+    '<div class="group info prev">'+(rows.length?rows.join(''):'<div class="empty">'+t('prevEmpty')+'</div>')+'</div>';
+  $('prevEdit').onclick=()=>openSheet(calSel);
+}
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.day');if(b){calSel=b.dataset.d;renderCal()}});
 $('prev').onclick=()=>{view.setMonth(view.getMonth()-1);renderCal()};
 $('next').onclick=()=>{view.setMonth(view.getMonth()+1);renderCal()};
-$('todayBtn').onclick=()=>{const n=new Date();view.setFullYear(n.getFullYear(),n.getMonth(),1);renderCal();openSheet(iso(n))};
+$('todayBtn').onclick=()=>{const n=new Date();view.setFullYear(n.getFullYear(),n.getMonth(),1);calSel=iso(n);renderCal();openSheet(iso(n))};
 /* Wischen zum Monatswechsel */
 let sx=null;$('grid').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
 $('grid').addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;
@@ -819,6 +851,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdat
   $('sbNote').hidden=(window.self===window.top);
   db=await openDB();if(!db)$('memNote').hidden=false;else{await loadAll();await loadMeta()}renderIud();
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  calSel=iso(new Date());
   applyLang();
   $('verNote').textContent='Version '+BUILD;
   setTimeout(checkUpdate,1500);
