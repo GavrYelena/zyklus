@@ -318,7 +318,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r13';
+const BUILD='r14';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -872,16 +872,17 @@ $('file').onchange=async e=>{
 };
 $('wipeBtn').onclick=async()=>{if(!await ask(t('deleteConfirm'),t('del'),true))return;await saveMany([],true);refresh();toast(t('wiped'))};
 
+let updTo=null;
 async function checkUpdate(){
   if(!navigator.onLine||location.protocol==='file:')return;
   try{
     const r=await fetch(location.pathname,{cache:'reload'});
     if(!r.ok)return;
     const m=(await r.text()).match(/const BUILD='([^']+)'/);
-    if(m&&m[1]!==BUILD){const u=$('upd');u.textContent=t('updAvail');u.hidden=false}
+    if(m&&m[1]!==BUILD){updTo=m[1];const u=$('upd');u.textContent=t('updAvail');u.hidden=false}
   }catch(e){}
 }
-$('upd').onclick=()=>location.reload();
+$('upd').onclick=()=>{location.href=location.pathname+'?v='+encodeURIComponent(updTo||Date.now())};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
 
 /* ---------- Start ---------- */
