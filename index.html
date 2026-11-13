@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zyklus">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" id="touchIcon">
+<title>Zyklus</title>
+<style>
+:root{color-scheme:dark;
+  --bg:#000;--s1:#1c1c1e;--s2:#2c2c2e;--s3:#3a3a3c;
+  --tx:#fff;--tx2:rgba(235,235,245,.6);--tx3:rgba(235,235,245,.3);
+  --red:#ff375f;--ov:#64d2ff;--pms:#ff9f0a;--spot:#d08a5c;--mood:#bf5af2;--blue:#0a84ff;--sep:rgba(84,84,88,.6);
+  --st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:calc(var(--st) + 8px) 16px calc(var(--sb) + 96px)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+.view{display:none}.view.on{display:block}
+h1{font-size:34px;line-height:1.1;letter-spacing:-.02em;font-weight:700;margin:8px 0 16px}
+h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;color:var(--tx2);margin:28px 16px 8px}
+
+/* Kalender */
+.mhead{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
+.mhead h1{margin:0;font-size:28px}
+.arrows{display:flex;gap:4px}
+.arrow{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;color:var(--red);transition:background .1s}
+.arrow:active{background:var(--s2)}
+.arrow svg{width:22px;height:22px}
+.wd,.grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.wd{font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px}
+.grid{row-gap:6px}
+.day{position:relative;aspect-ratio:1;display:grid;place-items:center;font-size:17px;font-variant-numeric:tabular-nums}
+.day .c{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;position:relative;transition:transform .1s ease-out}
+.day:active .c{transform:scale(.9)}
+.day.fut{color:var(--tx3)}
+.day .ap{position:absolute;top:3px;right:calc(50% - 22px);width:7px;height:7px;border-radius:2px;background:var(--blue)}
+.day.today .c{box-shadow:inset 0 0 0 2px var(--tx)}
+.day.f1 .c{background:rgba(255,55,95,.35)}
+.day.f2 .c{background:rgba(255,55,95,.6)}
+.day.f3 .c{background:rgba(255,55,95,.85)}
+.day.f4 .c{background:var(--red);box-shadow:0 0 0 3px rgba(255,55,95,.35)}
+.day.today.f4 .c{box-shadow:inset 0 0 0 2px var(--tx),0 0 0 3px rgba(255,55,95,.35)}
+.day.sp .c::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px dashed var(--spot)}
+.day .mk{position:absolute;bottom:1px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--mood)}
+.day.pp .c{background:rgba(255,55,95,.2)}
+.day.pf .c{background:rgba(100,210,255,.15)}
+.day.po .c{background:rgba(100,210,255,.32)}
+.day.ps .c{background:rgba(255,159,10,.14)}
+.day.fut.pp,.day.fut.pf,.day.fut.po,.day.fut.ps{color:var(--tx2)}
+.legend{flex-wrap:wrap;row-gap:6px}
+
+/* Zyklus */
+.ring{position:relative;width:min(340px,88vw);margin:4px auto 4px;aspect-ratio:1}
+.ring svg{width:100%;height:100%;overflow:visible}
+.ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .k{font-size:15px;color:var(--tx2);font-weight:500}
+.ring .ctr{padding:0 25%;pointer-events:none;text-align:center;gap:6px}
+.ring .st{font-size:23px;line-height:1.12;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.ring .fun{font-size:14px;line-height:1.3;color:var(--tx2);text-wrap:balance;min-height:2.6em}
+.ring .back{pointer-events:auto;font-size:15px;color:var(--red);font-weight:600;padding:6px 10px}
+#ringSvg{touch-action:none;cursor:pointer}
+.ring .n{font-size:76px;line-height:1;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:4px 0}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.card{background:var(--s1);border-radius:16px;padding:14px 16px}
+.card .t{font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.card .t i{width:8px;height:8px;border-radius:50%}
+.card .v{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-top:6px}
+.card .d{font-size:15px;color:var(--tx2);margin-top:2px}
+.card .v.late{color:#ff9f0a}
+.seg.wide{margin:0 0 16px}
+.chart{background:var(--s1);border-radius:16px;padding:14px 12px 10px;margin-top:12px}
+.chart h3{margin:0 4px 10px;font-size:15px;font-weight:600}
+.chart svg{width:100%;display:block}
+.strip{display:flex;align-items:center;gap:8px;padding:3px 4px;font-size:13px;color:var(--tx2);font-variant-numeric:tabular-nums}
+.strip .m{width:52px;flex:none}
+.strip .sq{display:flex;gap:3px;flex:1}
+.strip .sq i{width:14px;height:14px;border-radius:4px;background:var(--s2)}
+.strip .n{width:28px;text-align:right}
+.cmp{width:100%;border-collapse:collapse;font-size:15px}
+.cmp td,.cmp th{padding:9px 6px;text-align:right;border-top:.5px solid var(--sep)}
+.cmp th{font-weight:600;color:var(--tx2);font-size:13px;border-top:0}
+.cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--tx2)}
+.legend{display:flex;gap:16px;justify-content:center;font-size:13px;color:var(--tx2);margin:16px 0 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.todaybtn{display:block;width:100%;margin-top:24px;padding:14px;border-radius:14px;background:var(--s1);color:var(--red);font-weight:600;transition:transform .1s ease-out,background .1s}
+.todaybtn:active{transform:scale(.98);background:var(--s2)}
+
+/* Listen / Einstellungen */
+.group{background:var(--s1);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:12px 16px;width:100%;text-align:left;position:relative}
+.row+.row::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+button.row{transition:background .1s}
+button.row:active{background:var(--s2)}
+.row.act{color:var(--blue)}
+.row.danger{color:var(--red)}
+.note{font-size:13px;color:var(--tx2);margin:8px 16px 0}
+.note.warn{color:#ff9f0a}
+.seg{display:flex;background:var(--s2);border-radius:9px;padding:2px}
+.seg button{flex:1;padding:6px 14px;border-radius:7px;font-size:15px;font-weight:500;transition:background .2s}
+.seg button.on{background:#636366}
+
+/* Tab-Leiste */
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:6px 0 calc(var(--sb) + 4px);
+  background:rgba(22,22,24,.72);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  border-top:.5px solid rgba(255,255,255,.12);z-index:10}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:500;color:#8e8e93;min-width:64px;padding:2px 0}
+.tab svg{width:26px;height:26px}
+.tab.on{color:var(--red)}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--s1);border-radius:14px 14px 0 0;
+  padding:8px 16px calc(var(--sb) + 20px);transform:translateY(105%);transition:transform .45s cubic-bezier(.32,.72,0,1);z-index:30;overscroll-behavior:contain}
+.sheet.on{transform:translateY(0)}
+.sheet.drag{transition:none}
+.grab{padding:4px 0 8px;touch-action:none}
+.grab::before{content:"";display:block;width:36px;height:5px;border-radius:3px;background:var(--s3);margin:0 auto 12px}
+.shead{display:flex;align-items:center;justify-content:space-between}
+.shead h3{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.done{color:var(--red);font-weight:600;padding:8px 0 8px 16px}
+.lbl{font-size:13px;color:var(--tx2);text-transform:uppercase;letter-spacing:.02em;margin:22px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:20px;background:var(--s2);font-size:15px;transition:transform .1s ease-out,background .15s}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--red);color:#fff}
+.chip.mood.on{background:var(--mood)}
+.chip.alt.on{background:#fff;color:#000}
+.field{width:100%;background:var(--s2);color:var(--tx);border:0;border-radius:12px;padding:12px 14px;font:inherit;font-size:17px;outline:none}
+textarea.field{min-height:84px;resize:vertical}
+.field::placeholder{color:var(--tx3)}
+.row input[type=date],.row select{background:var(--s2);color:var(--tx);border:0;border-radius:8px;padding:6px 10px;font:inherit;font-size:16px}
+.info{margin-top:12px}
+.info .row .r{color:var(--tx2);text-align:right;font-size:15px}
+.info .row .r.warn{color:#ff9f0a}
+.switchrow{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:12px;padding:10px 14px}
+.sw{width:51px;height:31px;border-radius:16px;background:#39393d;position:relative;transition:background .2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.sw.on{background:var(--spot)}
+.sw.on::after{transform:translateX(20px)}
+
+/* Dialog + Toast */
+.dlg{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.dlg.on{opacity:1;pointer-events:auto}
+.box{width:min(300px,84vw);background:rgba(44,44,46,.92);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border-radius:14px;text-align:center;overflow:hidden;transform:scale(1.1);transition:transform .2s}
+.dlg.on .box{transform:scale(1)}
+.box p{margin:0;padding:20px 16px;font-size:15px;line-height:1.35}
+.btns{display:flex;border-top:.5px solid var(--sep)}
+.btns button{flex:1;padding:12px;color:var(--blue);font-size:17px}
+.btns button+button{border-left:.5px solid var(--sep);font-weight:600}
+.btns button.danger{color:var(--red)}
+.toast{position:fixed;left:50%;bottom:calc(var(--sb) + 90px);transform:translate(-50%,20px);background:rgba(58,58,60,.95);padding:10px 18px;border-radius:20px;font-size:15px;opacity:0;transition:opacity .25s,transform .25s;z-index:60;max-width:90vw;text-align:center;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){
+  .sheet,.scrim,.dlg,.box,.toast,.sw::after{transition:opacity .2s!important}
+  .sheet{transform:none;opacity:0;pointer-events:none}.sheet.on{opacity:1;pointer-events:auto}
+}
+@media (prefers-reduced-transparency:reduce){.tabs,.box{background:#1c1c1e;backdrop-filter:none;-webkit-backdrop-filter:none}}
+</style>
+</head>
+<body>
+
+<section class="view on" id="vCyc">
+  <h1 data-t="cycle"></h1>
+  <div id="cyc"></div>
+</section>
+
+<section class="view" id="vCal">
+  <div class="mhead">
+    <h1 id="mTitle"></h1>
+    <div class="arrows">
+      <button class="arrow" id="prev" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="arrow" id="next" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <div class="wd" id="wd"></div>
+  <div class="grid" id="grid"></div>
+  <div class="legend" id="legend"></div>
+  <button class="todaybtn" id="todayBtn"></button>
+</section>
+
+<section class="view" id="vAna">
+  <h1 data-t="analysis"></h1>
+  <div class="seg wide" id="rangeSeg"><button data-r="12"></button><button data-r="0"></button></div>
+  <div id="ana"></div>
+</section>
+
+<section class="view" id="vSet">
+  <h1 data-t="settings"></h1>
+  <h2 data-t="language"></h2>
+  <div class="group"><div class="row"><span data-t="language"></span>
+    <div class="seg" id="langSeg"><button data-l="de">DE</button><button data-l="ru">RU</button></div></div></div>
+
+  <h2 data-t="backup"></h2>
+  <div class="group">
+    <button class="row act" id="exportBtn" data-t="export"></button>
+    <button class="row act" id="copyBtn" data-t="copy"></button>
+    <button class="row act" id="importBtn" data-t="import"></button>
+  </div>
+  <p class="note" id="stats"></p>
+  <p class="note" id="lastBk"></p>
+  <p class="note" data-t="importHint"></p>
+  <p class="note warn" id="sbNote" hidden data-t="sandboxNote"></p>
+  <p class="note warn" id="memNote" hidden data-t="storageWarn"></p>
+
+  <h2 data-t="contraception"></h2>
+  <div class="group">
+    <div class="row"><span data-t="iudSince"></span><input type="date" id="iudDate"></div>
+    <div class="row"><span data-t="iudYears"></span><select id="iudYears"><option value="3">3</option><option value="5">5</option><option value="10">10</option></select></div>
+  </div>
+  <p class="note" data-t="iudHint"></p>
+
+  <h2>&nbsp;</h2>
+  <div class="group"><button class="row danger" id="wipeBtn" data-t="deleteAll"></button></div>
+  <input type="file" id="file" accept=".json,application/json" hidden>
+</section>
+
+<nav class="tabs">
+  <button class="tab on" data-v="vCyc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a9 9 0 1 1-8.5 6"/><circle cx="12" cy="3.5" r="1.6" fill="currentColor"/></svg><span data-t="cycle"></span></button>
+  <button class="tab" data-v="vCal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-t="calendar"></span></button>
+  <button class="tab" data-v="vAna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-t="analysis"></span></button>
+  <button class="tab" data-v="vSet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span data-t="settings"></span></button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog">
+  <div class="grab" id="grab"><div class="shead"><h3 id="sTitle"></h3><button class="done" id="doneBtn" data-t="done"></button></div></div>
+  <div id="pastSec">
+  <div class="lbl" data-t="bleeding"></div>
+  <div class="chips" id="flowChips"></div>
+  <div class="lbl">&nbsp;</div>
+  <button class="switchrow" id="spotRow" style="width:100%"><span data-t="spotting"></span><span class="sw" id="spotSw"></span></button>
+  <div class="lbl" data-t="pain"></div>
+  <div class="chips" id="painChips"></div>
+  <div class="lbl" data-t="mood"></div>
+  <div class="chips" id="moodChips"></div>
+  <div class="lbl" data-t="energy"></div>
+  <div class="chips" id="energyChips"></div>
+  <div class="lbl" data-t="libido"></div>
+  <div class="chips" id="libidoChips"></div>
+  <div class="lbl" data-t="sex"></div>
+  <div class="chips" id="sexChips"></div>
+  </div>
+  <div class="lbl" data-t="appt"></div>
+  <input class="field" id="apptIn" autocomplete="off">
+  <div id="noteSec">
+  <div class="lbl" data-t="note"></div>
+  <textarea class="field" id="noteIn"></textarea>
+  </div>
+</div>
+
+<div class="dlg" id="dlg"><div class="box"><p id="dlgMsg"></p><div class="btns"><button id="dlgNo"></button><button id="dlgYes"></button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const FLOWS=['light','medium','heavy','very_heavy'];
+const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
+const I18N={
+de:{
+ analysis:'Analyse',last12:'Letzte 12 Zyklen',all:'Alle',
+ aAvg:'Ø Zykluslänge',aVar:'Schwankung',aDur:'Ø Periodendauer',aCount:'Zyklen',
+ days:'{n} Tage',range:'{a}–{b} Tage',since:'seit {d}',regular:'regelmäßig',irregular:'unregelmäßig',fairly:'eher regelmäßig',
+ chLen:'Zykluslänge',chFlow:'Stärke pro Periode',dashAvg:'gestrichelt = Durchschnitt',
+ iudCmp:'Kupferspirale: vorher / nachher',before:'Vorher',after:'Nachher',
+ rLen:'Ø Zykluslänge',rDur:'Ø Periodendauer',rInt:'Ø Stärke',rHeavy:'Anteil starker Tage',rN:'Perioden',
+ fewData:'Noch wenig Daten nach dem Einsetzen – Werte mit Vorsicht lesen.',
+ durNote:'Perioden mit ≤ 2 erfassten Tagen zählen nicht in die Ø Dauer.',
+ pain:'Schmerzen',cramps:'Krämpfe',headache:'Kopfschmerzen',breasts:'Brustspannen',back:'Rücken',
+ energy:'Energie',libido:'Libido',low:'Niedrig',ok:'Normal',high:'Hoch',
+ sex:'Sex',sexNone:'Keiner',protected:'Geschützt',unprotected:'Ungeschützt',
+ appt:'Gyn-Termin',apptPh:'z. B. 14:00 Krebsvorsorge',note:'Notiz',notePh:'Alles, was sonst wichtig ist',
+ contraception:'Kupferspirale',iudSince:'Eingesetzt am',iudYears:'Liegedauer (Jahre)',iudHint:'Leer lassen, wenn keine Spirale liegt.',
+ nextAppt:'Nächster Termin',iud:'Kupferspirale',iudIn:'seit {y}',iudDue:'Wechsel fällig {d}',iudSoon:'Wechsel in {n} Monaten',iudOver:'Wechsel überfällig',
+ ym:'{y} J. {m} Mon.',
+ clueMore:' Dazu {o} weitere Einträge (Sex, Schmerzen, Energie).',
+ calendar:'Kalender',settings:'Einstellungen',today:'Heute eintragen',bleeding:'Periode',spotting:'Schmierblutung',mood:'Stimmung',done:'Fertig',
+ none:'Keine',light:'Leicht',medium:'Mittel',heavy:'Stark',very_heavy:'Sehr stark',
+ happy:'Glücklich',calm:'Ruhig',sensitive:'Empfindlich',sad:'Traurig',irritable:'Gereizt',anxious:'Ängstlich',angry:'Wütend',mood_swings:'Stimmungsschwankungen',not_in_control:'Überfordert',pms:'PMS',
+ language:'Sprache',backup:'Datensicherung',export:'Backup als Datei sichern',copy:'Backup als Text kopieren',import:'Datei importieren',
+ importHint:'Import: eigenes Backup (ersetzt alles) oder Clue-Export measurements.json (wird ergänzt).',
+ deleteAll:'Alle Daten löschen',deleteConfirm:'Alle Einträge werden gelöscht. Das lässt sich nicht rückgängig machen.',
+ cancel:'Abbrechen',add:'Hinzufügen',replace:'Ersetzen',del:'Löschen',
+ stats:'{n} Tage erfasst, seit {d}',noData:'Noch keine Daten',lastBk:'Letztes Backup: {d}',noBk:'Noch kein Backup',
+ clueFound:'Clue-Export erkannt: {p} Periodentage, {s} × Schmierblutung, {m} × Stimmung. Zu den vorhandenen Daten hinzufügen?',
+ backupFound:'Backup vom {d} mit {n} Tagen. Es ersetzt alle aktuellen Daten.',
+ badFile:'Datei nicht erkannt.',imported:'Importiert: {n} Tage',copied:'Kopiert. In Notizen oder Dateien einfügen.',copyFail:'Kopieren nicht möglich.',
+ exported:'Backup erstellt.',wiped:'Alle Daten gelöscht.',
+ sandboxNote:'Testversion: Datei-Download ist hier blockiert. Nutze „Als Text kopieren“.',
+ storageWarn:'Speicher nicht verfügbar – Daten gehen beim Schließen verloren. Backup machen!',
+ legP:'Periode',legS:'Schmierblutung',legM:'Stimmung',legF:'Periode (Prognose)',legO:'Eisprung',
+ backToday:'Zurück zu heute',
+ h_period:'Periode · Tag {n}',f_period:'Schonmodus an. Wärmflasche, Schokolade, Termine absagen.',
+ h_rise:'Aufwärtsphase',f_rise:'Die Energie kommt zurück. Gute Zeit für Neues, Sport und große Pläne.',
+ h_fertile:'Fruchtbares Fenster',f_fertile:'Hoch-Phase. Du strahlst – und weißt es.',
+ h_ov:'Eisprung (geschätzt)',f_ov:'Peak-Tag. Selbstbewusst, gesprächig, unwiderstehlich.',
+ h_luteal:'Ruhige Phase',f_luteal:'Gang runterschalten. Sofa schlägt Party.',
+ h_pmsSoft:'PMS im Anmarsch',f_pmsSoft:'Die Zündschnur wird kürzer. Snacks bereitlegen.',
+ h_pms:'PMS',f_pms:'Dünnes Nervenkostüm. Wer dich jetzt ärgert, ist selbst schuld.',
+ h_late:'{n} Tage drüber',f_late:'Die Periode lässt auf sich warten. Abwarten – oder abklären lassen.',
+ cycle:'Zyklus',dayShort:'Tag',todayDate:'Heute, {d}',sub:'Zykluslänge ca. {a} Tage',legFert:'Fruchtbar',stPeriod:'Periode, Tag {n}',stOv:'Eisprung heute (geschätzt)',stFertile:'Fruchtbares Fenster',stBeforeFert:'Fruchtbares Fenster {r}',stAfter:'Periode {r}',stLate:'Periode {n} Tage überfällig',cycleDay:'Zyklustag',ofAbout:'von ca. {n}',nextPeriod:'Nächste Periode',ovulation:'Eisprung',
+ inDays:'in {n} Tagen',tomorrow:'morgen',todayW:'heute',late:'{n} Tage drüber',lateOne:'1 Tag drüber',ovPast:'vorbei',
+ basis:'Prognose aus dem Ø der letzten {k} Zyklen: {n} Tage. Eisprung = 14 Tage vor der nächsten Periode, fruchtbar = 5 Tage davor bis 1 Tag danach.',
+ needData:'Für eine Prognose braucht es mindestens 2 erfasste Perioden. Trag sie im Kalender ein oder importiere den Clue-Export.'},
+ru:{
+ analysis:'Анализ',last12:'Последние 12 циклов',all:'Все',
+ aAvg:'Средняя длина цикла',aVar:'Разброс',aDur:'Средняя длительность',aCount:'Циклов',
+ days:'{n} дн.',range:'{a}–{b} дн.',since:'с {d}',regular:'регулярный',irregular:'нерегулярный',fairly:'довольно регулярный',
+ chLen:'Длина цикла',chFlow:'Обильность по месячным',dashAvg:'пунктир = среднее',
+ iudCmp:'Медная спираль: до / после',before:'До',after:'После',
+ rLen:'Средняя длина цикла',rDur:'Средняя длительность',rInt:'Средняя обильность',rHeavy:'Доля обильных дней',rN:'Месячных',
+ fewData:'После установки пока мало данных – значения ориентировочные.',
+ durNote:'Месячные, где записано ≤ 2 дней, не входят в среднюю длительность.',
+ pain:'Боль',cramps:'Спазмы',headache:'Головная боль',breasts:'Грудь',back:'Спина',
+ energy:'Энергия',libido:'Либидо',low:'Низкая',ok:'Норма',high:'Высокая',
+ sex:'Секс',sexNone:'Не было',protected:'Защищённый',unprotected:'Незащищённый',
+ appt:'Визит к гинекологу',apptPh:'напр. 14:00 профилактика',note:'Заметка',notePh:'Всё остальное важное',
+ contraception:'Медная спираль',iudSince:'Установлена',iudYears:'Срок (лет)',iudHint:'Оставь пустым, если спирали нет.',
+ nextAppt:'Следующий визит',iud:'Медная спираль',iudIn:'стоит {y}',iudDue:'замена до {d}',iudSoon:'замена через {n} мес.',iudOver:'срок замены прошёл',
+ ym:'{y} г. {m} мес.',
+ clueMore:' Плюс ещё {o} записей (секс, боль, энергия).',
+ calendar:'Календарь',settings:'Настройки',today:'Отметить сегодня',bleeding:'Месячные',spotting:'Мажущие выделения',mood:'Настроение',done:'Готово',
+ none:'Нет',light:'Слабые',medium:'Умеренные',heavy:'Обильные',very_heavy:'Очень обильные',
+ happy:'Радость',calm:'Спокойствие',sensitive:'Чувствительность',sad:'Грусть',irritable:'Раздражение',anxious:'Тревога',angry:'Злость',mood_swings:'Перепады настроения',not_in_control:'Потеря контроля',pms:'ПМС',
+ language:'Язык',backup:'Резервная копия',export:'Сохранить копию файлом',copy:'Скопировать копию как текст',import:'Импортировать файл',
+ importHint:'Импорт: своя копия (заменяет всё) или экспорт Clue measurements.json (добавляется).',
+ deleteAll:'Удалить все данные',deleteConfirm:'Все записи будут удалены. Отменить это нельзя.',
+ cancel:'Отмена',add:'Добавить',replace:'Заменить',del:'Удалить',
+ stats:'Записано дней: {n}, с {d}',noData:'Пока нет данных',lastBk:'Последняя копия: {d}',noBk:'Копий ещё не было',
+ clueFound:'Найден экспорт Clue: дней месячных {p}, мажущих {s}, настроение {m}. Добавить к текущим данным?',
+ backupFound:'Копия от {d}, дней: {n}. Она заменит все текущие данные.',
+ badFile:'Файл не распознан.',imported:'Импортировано дней: {n}',copied:'Скопировано. Вставь в Заметки или Файлы.',copyFail:'Не удалось скопировать.',
+ exported:'Копия создана.',wiped:'Все данные удалены.',
+ sandboxNote:'Тестовая версия: скачивание файлов здесь заблокировано. Используй «Скопировать как текст».',
+ storageWarn:'Хранилище недоступно – данные пропадут при закрытии. Сделай копию!',
+ legP:'Месячные',legS:'Мажущие',legM:'Настроение',legF:'Месячные (прогноз)',legO:'Овуляция',
+ backToday:'Вернуться к сегодня',
+ h_period:'Месячные · день {n}',f_period:'Режим экономии. Грелка, шоколад, встречи отменить.',
+ h_rise:'Подъём',f_rise:'Энергия возвращается. Время для нового, спорта и больших планов.',
+ h_fertile:'Фертильное окно',f_fertile:'Пик формы. Ты сияешь – и сама это знаешь.',
+ h_ov:'Овуляция (прогноз)',f_ov:'Звёздный день. Уверенная, разговорчивая, неотразимая.',
+ h_luteal:'Спокойная фаза',f_luteal:'Сбавить обороты. Диван лучше вечеринки.',
+ h_pmsSoft:'ПМС на подходе',f_pmsSoft:'Фитиль становится короче. Запасись вкусняшками.',
+ h_pms:'ПМС',f_pms:'Нервы на пределе. Кто сейчас злит – сам виноват.',
+ h_late:'Задержка {n} дн.',f_late:'Месячные задерживаются. Подождать – или проверить.',
+ cycle:'Цикл',dayShort:'День',todayDate:'Сегодня, {d}',sub:'Длина цикла ~{a} дн.',legFert:'Фертильность',stPeriod:'Месячные, день {n}',stOv:'Овуляция сегодня (прогноз)',stFertile:'Фертильное окно',stBeforeFert:'Фертильное окно {r}',stAfter:'Месячные {r}',stLate:'Задержка {n} дн.',cycleDay:'День цикла',ofAbout:'из ~{n}',nextPeriod:'Следующие месячные',ovulation:'Овуляция',
+ inDays:'через {n} дн.',tomorrow:'завтра',todayW:'сегодня',late:'задержка {n} дн.',lateOne:'задержка 1 день',ovPast:'прошла',
+ basis:'Прогноз по среднему за последние {k} циклов: {n} дн. Овуляция = за 14 дней до следующих месячных, фертильно = 5 дней до и 1 день после.',
+ needData:'Для прогноза нужно минимум 2 записанных месячных. Отметь их в календаре или импортируй экспорт Clue.'}
+};
+const $=id=>document.getElementById(id);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let lang=store.get('lang')||((navigator.language||'de').startsWith('ru')?'ru':'de');
+const t=(k,p)=>{let s=(I18N[lang][k]??k);if(p)for(const x in p)s=s.replace('{'+x+'}',p[x]);return s};
+const label=k=>I18N[lang][k]??String(k).replace(/_/g,' ');
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fromIso=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const fmt=(s,o)=>new Intl.DateTimeFormat(lang,o).format(fromIso(s));
+
+/* ---------- Speicher (IndexedDB) ---------- */
+let db=null;const mem=new Map();
+let meta={};
+function openDB(){return new Promise(res=>{try{const r=indexedDB.open('zyklus',2);
+  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('days'))d.createObjectStore('days',{keyPath:'date'});
+    if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'})};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null);}catch(e){res(null)}})}
+function tx(fn){return new Promise((res,rej)=>{if(!db)return res();try{const x=db.transaction('days','readwrite');fn(x.objectStore('days'));
+  x.oncomplete=()=>res();x.onerror=()=>rej(x.error);x.onabort=()=>rej(x.error)}catch(e){rej(e)}})}
+function loadAll(){return new Promise(res=>{if(!db)return res();try{const r=db.transaction('days').objectStore('days').getAll();
+  r.onsuccess=()=>{r.result.forEach(d=>mem.set(d.date,d));res()};r.onerror=()=>res()}catch(e){res()}})}
+function loadMeta(){return new Promise(res=>{if(!db)return res();try{const r=db.transaction('meta').objectStore('meta').getAll();
+  r.onsuccess=()=>{r.result.forEach(m=>meta[m.key]=m);res()};r.onerror=()=>res()}catch(e){res()}})}
+function saveMeta(key,val){if(val)meta[key]={key,...val};else delete meta[key];
+  return new Promise(res=>{if(!db)return res();try{const x=db.transaction('meta','readwrite'),st=x.objectStore('meta');
+    val?st.put(meta[key]):st.delete(key);x.oncomplete=res;x.onerror=res}catch(e){res()}})}
+const storeFail=()=>{db=null;$('memNote').hidden=false;toast(t('storageWarn'))};
+const isEmpty=d=>!d.flow&&!d.spotting&&!(d.moods&&d.moods.length)&&!(d.pain&&d.pain.length)&&!d.energy&&!d.libido&&!d.sex&&!d.appt&&!d.note;
+const getDay=s=>({date:s,flow:null,spotting:false,moods:[],pain:[],energy:null,libido:null,sex:null,appt:'',note:'',...(mem.get(s)||{})});
+async function saveDay(d){
+  if(isEmpty(d)){mem.delete(d.date);await tx(s=>s.delete(d.date)).catch(storeFail)}
+  else{mem.set(d.date,d);await tx(s=>s.put(d)).catch(storeFail)}
+}
+async function saveMany(list,replace){
+  if(replace)mem.clear();list.forEach(d=>mem.set(d.date,d));
+  await tx(s=>{if(replace)s.clear();list.forEach(d=>s.put(d))}).catch(storeFail);
+}
+
+/* ---------- Zyklus-Berechnung ---------- */
+const DAY=864e5;
+const diff=(a,b)=>Math.round((fromIso(b)-fromIso(a))/DAY);
+const addDays=(s,n)=>{const d=fromIso(s);d.setDate(d.getDate()+n);return iso(d)};
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+function periods(){ // zusammenhängende Periodentage; Lücke ≤ 9 Tage = gleiche Periode
+  const pd=[...mem.values()].filter(d=>d.flow).map(d=>d.date).sort(),runs=[];
+  for(const s of pd){const l=runs[runs.length-1];if(l&&diff(l.end,s)<=9)l.end=s;else runs.push({start:s,end:s})}
+  return runs;
+}
+function forecast(){
+  const runs=periods();if(runs.length<2)return null;
+  const lens=[];for(let i=1;i<runs.length;i++)lens.push(diff(runs[i-1].start,runs[i].start));
+  const last=lens.slice(-6),avg=Math.round(mean(last));
+  const durs=runs.map(r=>diff(r.start,r.end)+1).filter(n=>n>2).slice(-6);
+  const avgDur=durs.length?Math.round(mean(durs)):5;
+  const today=iso(new Date()),lastStart=runs[runs.length-1].start,next=addDays(lastStart,avg);
+  return{avg,avgDur,k:last.length,lastStart,next,ov:addDays(next,-14),cycleDay:diff(lastStart,today)+1,today};
+}
+let fc=null;
+function rel(n){return n===0?t('todayW'):n===1?t('tomorrow'):t('inDays',{n})}
+let sel=null;
+function phaseOf(d){const f=fc;if(!f)return null;
+  if(d<=f.perEnd)return'period';
+  if(d>f.avg)return'late';
+  if(d===f.ovDay)return'ov';
+  if(d>=f.f1&&d<=f.f2)return'fertile';
+  if(d>f.avg-7)return d<=f.avg-5?'pmsSoft':'pms';
+  if(d<f.f1)return'rise';
+  return'luteal';
+}
+const PH_COL={period:'var(--red)',fertile:'var(--ov)',ov:'var(--ov)',pms:'var(--pms)',pmsSoft:'var(--pms)',late:'#ff9f0a',rise:'#8e8e93',luteal:'#8e8e93'};
+function renderCycle(){
+  fc=forecast();const el=$('cyc');
+  if(!fc){el.innerHTML='<p class="note" style="margin:24px 0">'+t('needData')+'</p>'+renderInfo();return}
+  const{avg,avgDur,cycleDay,next,ov,today,k}=fc;
+  fc.ovDay=diff(fc.lastStart,ov)+1;fc.f1=fc.ovDay-5;fc.f2=fc.ovDay+1;
+  const l=periods().pop();fc.perEnd=Math.max(diff(l.start,l.end)+1,avgDur);
+  const total=fc.total=Math.max(avg,cycleDay);
+  const C=170,R=132,ang=d=>((d-0.5)/total)*2*Math.PI-Math.PI/2,P=(rad,a)=>[C+rad*Math.cos(a),C+rad*Math.sin(a)];
+  const arc=(d1,d2,col,op)=>{if(d2<d1)return'';const a1=((d1-1)/total)*2*Math.PI-Math.PI/2+0.14,a2=(d2/total)*2*Math.PI-Math.PI/2-0.14;
+    const[x1,y1]=P(R,a1),[x2,y2]=P(R,a2);return'<path d="M'+x1+' '+y1+' A'+R+' '+R+' 0 '+(a2-a1>Math.PI?1:0)+' 1 '+x2+' '+y2+'" fill="none" stroke="'+col+'" stroke-width="30" stroke-linecap="round" opacity="'+op+'"/>'};
+  let dots='';
+  for(let d=1;d<=total;d++){const[x,y]=P(R-34,ang(d));
+    dots+='<circle cx="'+x+'" cy="'+y+'" r="'+(d===cycleDay?5:3.2)+'" fill="'+(d===cycleDay?'#fff':PH_COL[phaseOf(d)])+'" opacity="'+(d<cycleDay?.35:.9)+'"/>'}
+  const[ox,oy]=P(R,ang(fc.ovDay));
+  el.innerHTML='<div class="ring"><svg id="ringSvg" viewBox="0 0 340 340">'+
+    '<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="var(--s1)" stroke-width="30"/>'+
+    arc(1,Math.min(fc.perEnd,total),'var(--red)',1)+arc(Math.max(1,fc.f1),Math.min(fc.f2,avg),'var(--ov)',1)+arc(Math.max(avg-6,fc.f2+1),avg,'var(--pms)',.75)+
+    '<circle cx="'+ox+'" cy="'+oy+'" r="9" fill="#fff"/>'+dots+
+    '<g id="badge"><circle r="28" fill="var(--bg)" stroke-width="4" id="bRing"/>'+
+    '<text y="-7" text-anchor="middle" fill="var(--tx2)" font-size="10" font-weight="600">'+t('dayShort')+'</text>'+
+    '<text id="bNum" y="14" text-anchor="middle" fill="#fff" font-size="22" font-weight="700"></text></g>'+
+    '</svg><div class="ctr"><span class="k" id="cDate"></span><span class="st" id="cHead"></span><span class="fun" id="cFun"></span>'+
+    '<button class="back" id="cBack">'+t('backToday')+'</button></div></div>'+
+    '<div class="legend"><span><i style="background:var(--red)"></i>'+t('legP')+'</span><span><i style="background:var(--ov)"></i>'+t('legFert')+'</span><span><i style="background:var(--pms)"></i>PMS</span></div>'+
+    '<div class="cards">'+card(t('nextPeriod'),'var(--red)',next,diff(today,next),true)+card(t('ovulation'),'var(--ov)',ov,diff(today,ov),false)+'</div>'+
+    renderInfo()+'<p class="note" style="margin:16px 4px 0">'+t('basis',{k,n:avg})+'</p>';
+  setSel(sel&&sel<=total?sel:cycleDay);
+  const svg=$('ringSvg');let dragging=false;
+  const dayAt=e=>{const r=svg.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;
+    const dist=Math.hypot(x,y)/(r.width/340);let a=Math.atan2(y,x)+Math.PI/2;if(a<0)a+=2*Math.PI;
+    return{d:Math.min(total,Math.floor(a/(2*Math.PI)*total)+1),dist}};
+  svg.addEventListener('pointerdown',e=>{const{d,dist}=dayAt(e);if(dist<R-70||dist>R+40)return;
+    dragging=true;svg.setPointerCapture(e.pointerId);setSel(d);e.preventDefault()});
+  svg.addEventListener('pointermove',e=>{if(dragging)setSel(dayAt(e).d)});
+  const up=()=>{dragging=false};svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+  $('cBack').onclick=()=>setSel(fc.cycleDay);
+  function card(title,col,date,n,isPeriod){
+    let v,cls='';
+    if(n>=0)v=rel(n);else if(isPeriod){v=n===-1?t('lateOne'):t('late',{n:-n});cls=' late'}else v=t('ovPast');
+    return'<div class="card"><div class="t"><i style="background:'+col+'"></i>'+title+'</div><div class="v'+cls+'">'+v+'</div><div class="d">'+fmt(date,{weekday:'short',day:'numeric',month:'short'})+'</div></div>';
+  }
+}
+function setSel(d){
+  if(!fc||!$('badge'))return;if(d===sel&&$('bNum').textContent)return;sel=d;
+  const total=fc.total,a=((d-0.5)/total)*2*Math.PI-Math.PI/2;
+  $('badge').setAttribute('transform','translate('+(170+132*Math.cos(a))+' '+(170+132*Math.sin(a))+')');
+  const ph=phaseOf(d);$('bRing').setAttribute('stroke',PH_COL[ph]);$('bNum').textContent=d;
+  const date=addDays(fc.lastStart,d-1),isToday=d===fc.cycleDay;
+  const ds=fmt(date,{weekday:'long',day:'numeric',month:'short'});
+  $('cDate').textContent=isToday?t('todayDate',{d:fmt(date,{day:'numeric',month:'short'})}):ds.charAt(0).toUpperCase()+ds.slice(1);
+  $('cHead').textContent=t('h_'+ph,{n:ph==='late'?d-fc.avg:d});
+  $('cFun').textContent=t('f_'+ph);
+  $('cBack').style.visibility=isToday?'hidden':'visible';
+}
+function nextAppt(){const td=iso(new Date());let best=null;
+  for(const d of mem.values())if(d.appt&&d.date>=td&&(!best||d.date<best.date))best=d;return best}
+function iudInfo(){const m=meta.iud;if(!m||!m.inserted)return null;
+  const ins=fromIso(m.inserted),now=new Date(),due=new Date(ins);due.setFullYear(due.getFullYear()+(+m.years||5));
+  const mon=(now.getFullYear()-ins.getFullYear())*12+now.getMonth()-ins.getMonth()-(now.getDate()<ins.getDate()?1:0);
+  const left=(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth();
+  return{since:t('ym',{y:Math.floor(mon/12),m:mon%12}),due:iso(due),left}}
+function renderInfo(){
+  const a=nextAppt(),iu=iudInfo();let h='';
+  if(a){const n=diff(iso(new Date()),a.date);
+    h+='<div class="row"><span>'+t('nextAppt')+'<br><span class="note" style="margin:0">'+esc(a.appt)+'</span></span><span class="r">'+
+      fmt(a.date,{weekday:'short',day:'numeric',month:'short'})+'<br>'+rel(n)+'</span></div>'}
+  if(iu){const warn=iu.left<=6;
+    h+='<div class="row"><span>'+t('iud')+'<br><span class="note" style="margin:0">'+t('iudIn',{y:iu.since})+'</span></span><span class="r'+(warn?' warn':'')+'">'+
+      (iu.left<0?t('iudOver'):warn?t('iudSoon',{n:iu.left}):t('iudDue',{d:fmt(iu.due,{month:'long',year:'numeric'})}))+'</span></div>'}
+  return h?'<div class="group info">'+h+'</div>':'';
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderIud(){const m=meta.iud||{};$('iudDate').value=m.inserted||'';$('iudYears').value=String(m.years||5)}
+function saveIud(){const d=$('iudDate').value;saveMeta('iud',d?{type:'copper',inserted:d,years:+$('iudYears').value}:null).then(refresh)}
+$('iudDate').addEventListener('change',saveIud);$('iudYears').addEventListener('change',saveIud);
+let range=12;
+const FW={light:1,medium:2,heavy:3,very_heavy:4};
+function cycleData(){
+  const runs=periods().map(r=>{const days=[];for(let i=0;i<=diff(r.start,r.end);i++){const d=mem.get(addDays(r.start,i));days.push(d&&d.flow?d.flow:null)}
+    const fl=days.filter(Boolean);return{...r,days,dur:days.length,intensity:fl.length?mean(fl.map(f=>FW[f])):0,heavy:fl.length?fl.filter(f=>FW[f]>=3).length/fl.length:0}});
+  runs.forEach((r,i)=>{r.len=i<runs.length-1?diff(r.start,runs[i+1].start):null});
+  return runs;
+}
+function stats(runs){
+  const lens=runs.map(r=>r.len).filter(x=>x!=null),durs=runs.map(r=>r.dur).filter(n=>n>2);
+  if(!lens.length)return null;const m=mean(lens);
+  return{avg:m,sd:Math.sqrt(mean(lens.map(x=>(x-m)**2))),min:Math.min(...lens),max:Math.max(...lens),
+    dur:durs.length?mean(durs):null,int:mean(runs.map(r=>r.intensity).filter(Boolean)),heavy:mean(runs.map(r=>r.heavy)),n:lens.length,runs:runs.length};
+}
+const nf=(x,d=1)=>new Intl.NumberFormat(lang,{maximumFractionDigits:d,minimumFractionDigits:0}).format(x);
+const intLabel=x=>t(FLOWS[Math.min(3,Math.max(0,Math.round(x)-1))]);
+function renderAnalysis(){
+  document.querySelectorAll('#rangeSeg button').forEach(b=>{b.classList.toggle('on',+b.dataset.r===range);b.textContent=t(+b.dataset.r?'last12':'all')});
+  const all=cycleData(),el=$('ana');
+  if(all.length<2){el.innerHTML='<p class="note">'+t('needData')+'</p>';return}
+  const runs=range?all.slice(-(range+1)):all,full=runs.filter(r=>r.len!=null),S=stats(runs);
+  const verdict=S.sd<=2.5?t('regular'):S.sd<=4?t('fairly'):t('irregular');
+  const card=(ti,v,d)=>'<div class="card"><div class="t">'+ti+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';
+  let h='<div class="cards" style="margin-top:0">'+
+    card(t('aAvg'),t('days',{n:nf(S.avg)}),t('range',{a:S.min,b:S.max}))+
+    card(t('aVar'),'± '+nf(S.sd)+' ',verdict)+
+    card(t('aDur'),S.dur?t('days',{n:nf(S.dur)}):'–',intLabel(S.int))+
+    card(t('aCount'),S.n,t('since',{d:fmt(runs[0].start,{month:'short',year:'numeric'})}))+'</div>';
+  // Balken Zykluslänge
+  const W=340,H=150,pad=22,bw=(W-pad)/full.length,lo=Math.min(20,S.min-2),hi=Math.max(36,S.max+1),y=v=>H-18-(v-lo)/(hi-lo)*(H-30);
+  let bars='';full.forEach((r,i)=>{const x=pad+i*bw,yy=y(r.len);
+    bars+='<rect x="'+(x+bw*.15)+'" y="'+yy+'" width="'+bw*.7+'" height="'+(H-18-yy)+'" rx="'+Math.min(4,bw*.3)+'" fill="var(--red)" opacity=".85"/>';
+    if(full.length<=14)bars+='<text x="'+(x+bw/2)+'" y="'+(yy-4)+'" text-anchor="middle" font-size="10" fill="var(--tx2)">'+r.len+'</text>';
+    if(full.length<=14||i%Math.ceil(full.length/7)===0)bars+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="var(--tx3)">'+fmt(r.start,{month:'narrow'})+'</text>'});
+  const ya=y(S.avg);
+  bars+='<line x1="'+pad+'" x2="'+W+'" y1="'+ya+'" y2="'+ya+'" stroke="#fff" stroke-dasharray="4 4" opacity=".6"/><text x="0" y="'+(ya+3)+'" font-size="10" fill="var(--tx2)">'+Math.round(S.avg)+'</text>';
+  h+='<div class="chart"><h3>'+t('chLen')+'</h3><svg viewBox="0 0 '+W+' '+H+'">'+bars+'</svg><p class="note" style="margin:4px 4px 0">'+t('dashAvg')+'</p></div>';
+  // Stärke pro Periode
+  const col={light:'rgba(255,55,95,.35)',medium:'rgba(255,55,95,.6)',heavy:'rgba(255,55,95,.85)',very_heavy:'#ff375f'};
+  h+='<div class="chart"><h3>'+t('chFlow')+'</h3>'+runs.slice().reverse().map(r=>'<div class="strip"><span class="m">'+fmt(r.start,{month:'short',year:'2-digit'})+'</span><span class="sq">'+
+    r.days.map(f=>'<i'+(f?' style="background:'+col[f]+'"':'')+'></i>').join('')+'</span><span class="n">'+r.dur+'</span></div>').join('')+
+    '<div class="legend" style="margin-top:10px">'+FLOWS.map(f=>'<span><i style="border-radius:3px;background:'+col[f]+'"></i>'+t(f)+'</span>').join('')+'</div>'+
+    '<p class="note" style="margin:8px 4px 0">'+t('durNote')+'</p></div>';
+  // Spirale vorher/nachher (immer auf allen Daten)
+  if(meta.iud&&meta.iud.inserted){const ins=meta.iud.inserted,b=stats(all.filter(r=>r.start<ins)),a=stats(all.filter(r=>r.start>=ins));
+    if(b&&a){const row=(l,f)=>'<tr><td>'+l+'</td><td>'+f(b)+'</td><td>'+f(a)+'</td></tr>';
+      h+='<div class="chart"><h3>'+t('iudCmp')+'</h3><table class="cmp"><tr><th></th><th>'+t('before')+'</th><th>'+t('after')+'</th></tr>'+
+        row(t('rLen'),x=>t('days',{n:nf(x.avg)}))+row(t('rDur'),x=>x.dur?t('days',{n:nf(x.dur)}):'–')+
+        row(t('rInt'),x=>intLabel(x.int)+' ('+nf(x.int)+')')+row(t('rHeavy'),x=>nf(x.heavy*100,0)+' %')+row(t('rN'),x=>x.runs)+'</table>'+
+        (a.runs<6?'<p class="note" style="margin:8px 4px 0">'+t('fewData')+'</p>':'')+'</div>'}}
+  el.innerHTML=h;
+}
+$('rangeSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){range=+b.dataset.r;renderAnalysis()}});
+function refresh(){renderCycle();renderCal();renderStats();renderAnalysis()}
+
+/* ---------- Kalender ---------- */
+const view=new Date();view.setDate(1);
+function renderCal(){
+  const pred=new Map();
+  if(fc){const A=fc.avg,ovd=A-13;
+    for(let c=0;c<8;c++){const st=addDays(fc.lastStart,c*A),pe=c===0?fc.perEnd:fc.avgDur;
+      for(let d=1;d<=A;d++){const ds=addDays(st,d-1);if(ds<fc.today)continue;let ph=null;
+        if(d<=pe)ph='pp';else if(d===ovd)ph='po';else if(d>=ovd-5&&d<=ovd+1)ph='pf';else if(d>A-7)ph='ps';
+        if(ph)pred.set(ds,ph)}}}
+  const title=new Intl.DateTimeFormat(lang,{month:'long',year:'numeric'}).format(view);
+  $('mTitle').textContent=title.charAt(0).toUpperCase()+title.slice(1);
+  $('wd').innerHTML=[...Array(7)].map((_,i)=>'<div>'+new Intl.DateTimeFormat(lang,{weekday:'narrow'}).format(new Date(2024,0,1+i))+'</div>').join('');
+  const today=iso(new Date()),y=view.getFullYear(),m=view.getMonth();
+  const off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate();
+  let h='';for(let i=0;i<off;i++)h+='<div></div>';
+  for(let d=1;d<=n;d++){
+    const s=y+'-'+pad(m+1)+'-'+pad(d),r=mem.get(s);let c='day';
+    if(s===today)c+=' today';if(s>today)c+=' fut';
+    if(r){if(r.flow)c+=' f'+(FLOWS.indexOf(r.flow)+1);if(r.spotting&&!r.flow)c+=' sp';}
+    if(!(r&&r.flow)&&pred.has(s))c+=' '+pred.get(s);
+    h+='<button class="'+c+'" data-d="'+s+'"><span class="c">'+d+'</span>'+(r&&r.moods&&r.moods.length?'<i class="mk"></i>':'')+(r&&r.appt?'<i class="ap"></i>':'')+'</button>';
+  }
+  $('grid').innerHTML=h;
+}
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.day');if(b)openSheet(b.dataset.d)});
+$('prev').onclick=()=>{view.setMonth(view.getMonth()-1);renderCal()};
+$('next').onclick=()=>{view.setMonth(view.getMonth()+1);renderCal()};
+$('todayBtn').onclick=()=>{const n=new Date();view.setFullYear(n.getFullYear(),n.getMonth(),1);renderCal();openSheet(iso(n))};
+/* Wischen zum Monatswechsel */
+let sx=null;$('grid').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+$('grid').addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;
+  if(Math.abs(dx)>60){view.setMonth(view.getMonth()+(dx<0?1:-1));renderCal()}},{passive:true});
+
+/* ---------- Tages-Sheet ---------- */
+let cur=null;
+function renderSheet(){
+  const r=getDay(cur);
+  const s=fmt(cur,{weekday:'long',day:'numeric',month:'long'});
+  $('sTitle').textContent=s.charAt(0).toUpperCase()+s.slice(1);
+  $('flowChips').innerHTML=[null,...FLOWS].map(f=>'<button class="chip'+(r.flow===f?' on':'')+'" data-f="'+(f||'')+'">'+t(f||'none')+'</button>').join('');
+  $('spotSw').classList.toggle('on',!!r.spotting);
+  const ms=[...MOODS,...(r.moods||[]).filter(x=>!MOODS.includes(x))];
+  $('moodChips').innerHTML=ms.map(k=>'<button class="chip mood'+((r.moods||[]).includes(k)?' on':'')+'" data-m="'+k+'">'+label(k)+'</button>').join('');
+  const ps=[...PAINS,...(r.pain||[]).filter(x=>!PAINS.includes(x))];
+  $('painChips').innerHTML=ps.map(k=>'<button class="chip alt'+((r.pain||[]).includes(k)?' on':'')+'" data-m="'+k+'">'+label(k)+'</button>').join('');
+  const one=(id,field,opts,lbl)=>$(id).innerHTML=opts.map(o=>'<button class="chip alt'+(r[field]===o?' on':'')+'" data-v="'+o+'">'+t(lbl?lbl(o):o)+'</button>').join('');
+  one('energyChips','energy',LEVELS);one('libidoChips','libido',LEVELS);one('sexChips','sex',SEXES,o=>o==='none'?'sexNone':o);
+  const fut=cur>iso(new Date());$('pastSec').hidden=fut;$('noteSec').hidden=fut;
+  if(document.activeElement!==$('apptIn'))$('apptIn').value=r.appt||'';
+  if(document.activeElement!==$('noteIn'))$('noteIn').value=r.note||'';
+  $('apptIn').placeholder=t('apptPh');$('noteIn').placeholder=t('notePh');
+}
+const PAINS=['cramps','headache','breasts','back'],LEVELS=['low','ok','high'],SEXES=['none','protected','unprotected'];
+async function update(fn,keep){const r=getDay(cur);const c={...r,moods:[...r.moods],pain:[...r.pain]};fn(c);
+  for(const k of['energy','libido','sex'])if(!c[k])delete c[k];for(const k of['appt','note'])if(!c[k])delete c[k];if(!c.pain.length)delete c.pain;
+  await saveDay(c);if(!keep)renderSheet();refresh()}
+$('painChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.m;
+  update(r=>{r.pain=r.pain.includes(k)?r.pain.filter(x=>x!==k):[...r.pain,k]})});
+[['energyChips','energy'],['libidoChips','libido'],['sexChips','sex']].forEach(([id,f])=>$(id).addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(b)update(r=>{r[f]=r[f]===b.dataset.v?null:b.dataset.v})}));
+let txT;[['apptIn','appt'],['noteIn','note']].forEach(([id,f])=>$(id).addEventListener('input',e=>{
+  clearTimeout(txT);const v=e.target.value,d=cur;txT=setTimeout(()=>{if(d===cur)update(r=>{r[f]=v.trim()},true)},400)}));
+$('flowChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)update(r=>{r.flow=b.dataset.f||null})});
+$('spotRow').onclick=()=>update(r=>{r.spotting=!r.spotting});
+$('moodChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.m;
+  update(r=>{r.moods=r.moods.includes(k)?r.moods.filter(x=>x!==k):[...r.moods,k]})});
+function openSheet(d){cur=d;renderSheet();$('sheet').scrollTop=0;$('sheet').classList.add('on');$('scrim').classList.add('on')}
+function closeSheet(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();const sh=$('sheet');sh.style.transform='';sh.classList.remove('on','drag');$('scrim').classList.remove('on');$('scrim').style.opacity=''}
+$('doneBtn').onclick=closeSheet;$('scrim').onclick=closeSheet;
+/* Sheet nach unten ziehen: 1:1, Geschwindigkeit entscheidet */
+(()=>{const sh=$('sheet'),g=$('grab');let y0=null,hist=[];
+  g.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;y0=e.clientY;hist=[[e.clientY,e.timeStamp]];g.setPointerCapture(e.pointerId);sh.classList.add('drag')});
+  g.addEventListener('pointermove',e=>{if(y0==null)return;let dy=e.clientY-y0;if(dy<0)dy=-Math.sqrt(-dy)*2;
+    sh.style.transform='translateY('+dy+'px)';$('scrim').style.opacity=String(Math.max(0,1-dy/400));
+    hist.push([e.clientY,e.timeStamp]);if(hist.length>5)hist.shift()});
+  const end=e=>{if(y0==null)return;const dy=e.clientY-y0;const a=hist[0],b=hist[hist.length-1];const v=b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1])*1000:0;
+    y0=null;sh.classList.remove('drag');
+    if(dy+v*0.2>140||v>800)closeSheet();else{sh.style.transform='';$('scrim').style.opacity=''}};
+  g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end);
+})();
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));window.scrollTo(0,0)});
+
+/* ---------- Sprache ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+  $('todayBtn').textContent=t('today');
+  $('legend').innerHTML='<span><i style="background:var(--red)"></i>'+t('legP')+'</span><span><i style="border:2px dashed var(--spot);width:8px;height:8px"></i>'+t('legS')+'</span><span><i style="background:var(--mood);width:6px;height:6px"></i>'+t('legM')+'</span><span><i style="background:rgba(255,55,95,.4)"></i>'+t('legF')+'</span><span><i style="background:rgba(100,210,255,.4)"></i>'+t('legFert')+'</span><span><i style="background:rgba(255,159,10,.4)"></i>PMS</span><span><i style="background:var(--blue);border-radius:2px;width:8px;height:8px"></i>'+t('appt')+'</span>';
+  refresh();if(cur)renderSheet();
+}
+$('langSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;store.set('lang',lang);applyLang()});
+
+/* ---------- Dialog / Toast ---------- */
+function ask(msg,yes,danger){return new Promise(res=>{$('dlgMsg').textContent=msg;$('dlgNo').textContent=t('cancel');
+  const y=$('dlgYes');y.textContent=yes;y.className=danger?'danger':'';$('dlg').classList.add('on');
+  const done=v=>{$('dlg').classList.remove('on');res(v)};$('dlgNo').onclick=()=>done(false);y.onclick=()=>done(true)})}
+let tt;function toast(m){const el=$('toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2600)}
+
+/* ---------- Statistik-Zeilen ---------- */
+function renderStats(){
+  const ks=[...mem.keys()].sort();
+  $('stats').textContent=ks.length?t('stats',{n:ks.length,d:fmt(ks[0],{day:'numeric',month:'short',year:'numeric'})}):t('noData');
+  const lb=store.get('lastBackup');
+  $('lastBk').textContent=lb?t('lastBk',{d:fmt(lb,{day:'numeric',month:'short',year:'numeric'})}):t('noBk');
+}
+
+/* ---------- Export ---------- */
+function backupJSON(){return JSON.stringify({app:'zyklus',version:2,exportedAt:new Date().toISOString(),
+  meta:Object.fromEntries(Object.entries(meta).map(([k,v])=>[k,(({key,...r})=>r)(v)])),days:[...mem.values()].sort((a,b)=>a.date<b.date?-1:1)},null,1)}
+const markBackup=()=>{store.set('lastBackup',iso(new Date()));renderStats()};
+$('exportBtn').onclick=async()=>{
+  const name='zyklus-backup-'+iso(new Date())+'.json',txt=backupJSON();
+  try{const f=new File([txt],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});markBackup();toast(t('exported'));return}}
+  catch(e){if(e&&e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);markBackup();toast(t('exported'));
+};
+$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(backupJSON());markBackup();toast(t('copied'))}catch(e){toast(t('copyFail'))}};
+
+/* ---------- Import (eigenes Backup oder Clue) ---------- */
+function parseClue(arr){
+  const out=new Map(),c={p:0,s:0,m:0,o:0};
+  const get=d=>{if(!out.has(d))out.set(d,{date:d,flow:null,spotting:false,moods:[]});return out.get(d)};
+  const map={light:'light',medium:'medium',heavy:'heavy',super_heavy:'very_heavy',very_heavy:'very_heavy'};
+  for(const it of arr){
+    if(!it||typeof it.date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(it.date))continue;
+    const v=it.value,opts=Array.isArray(v)?v.map(x=>x&&x.option).filter(Boolean):(v&&v.option?[v.option]:[]);
+    if(it.type==='period'){const f=map[opts[0]];if(f){get(it.date).flow=f;c.p++}}
+    else if(it.type==='spotting'){get(it.date).spotting=true;c.s++}
+    else if(it.type==='feelings'&&opts.length){const r=get(it.date);opts.forEach(o=>{if(!r.moods.includes(o))r.moods.push(o)});c.m++}
+    else if(it.type==='pain'&&opts.length){const r=get(it.date);r.pain=r.pain||[];
+      opts.map(o=>({period_cramps:'cramps',cramps:'cramps',headache:'headache',breast_tenderness:'breasts',tender_breasts:'breasts',lower_back:'back',backache:'back',back_pain:'back'}[o]||o))
+        .forEach(o=>{if(!r.pain.includes(o))r.pain.push(o)});c.o++}
+    else if(it.type==='energy'&&opts.length){const e={exhausted:'low',tired:'low',low_energy:'low',ok:'ok',fine:'ok',energized:'high',high_energy:'high'}[opts[0]];if(e){get(it.date).energy=e;c.o++}}
+    else if(it.type==='sex_life'&&opts.length){const r=get(it.date);
+      for(const o of opts){if(o==='protected')r.sex='protected';else if(o==='unprotected'||o==='withdrawal')r.sex='unprotected';
+        else if(o==='no_sex_today'&&!r.sex)r.sex='none';else if(o==='high_sex_drive')r.libido='high';else if(o==='low_sex_drive')r.libido='low'}c.o++}
+  }
+  return{days:[...out.values()].filter(d=>!isEmpty(d)),c};
+}
+function cleanDay(d){if(!d||typeof d.date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(d.date))return null;
+  const arr=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'):[],str=v=>typeof v==='string'&&v?v.slice(0,2000):undefined;
+  const o={date:d.date,flow:FLOWS.includes(d.flow)?d.flow:null,spotting:!!d.spotting,moods:arr(d.moods)};
+  if(arr(d.pain).length)o.pain=arr(d.pain);
+  if(LEVELS.includes(d.energy))o.energy=d.energy;if(LEVELS.includes(d.libido))o.libido=d.libido;if(SEXES.includes(d.sex))o.sex=d.sex;
+  if(str(d.appt))o.appt=str(d.appt);if(str(d.note))o.note=str(d.note);return o}
+$('importBtn').onclick=()=>{$('file').value='';$('file').click()};
+$('file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;let data;
+  try{data=JSON.parse(await f.text())}catch(err){toast(t('badFile'));return}
+  if(Array.isArray(data)&&data.some(x=>x&&x.type&&x.date)){
+    const{days,c}=parseClue(data);if(!days.length){toast(t('badFile'));return}
+    if(!await ask(t('clueFound',c)+(c.o?t('clueMore',c):''),t('add')))return;
+    const merged=days.map(d=>{const e=mem.get(d.date);if(!e)return d;
+      const m={...e,...Object.fromEntries(Object.entries(d).filter(([k,v])=>v))};
+      m.spotting=!!(d.spotting||e.spotting);m.moods=[...new Set([...(e.moods||[]),...d.moods])];
+      if(e.pain||d.pain)m.pain=[...new Set([...(e.pain||[]),...(d.pain||[])])];return m});
+    await saveMany(merged,false);toast(t('imported',{n:days.length}));
+  }else if(data&&data.app==='zyklus'&&Array.isArray(data.days)){
+    const days=data.days.map(cleanDay).filter(d=>d&&!isEmpty(d));
+    const d=data.exportedAt?fmt(data.exportedAt.slice(0,10),{day:'numeric',month:'short',year:'numeric'}):'?';
+    if(!await ask(t('backupFound',{d,n:days.length}),t('replace'),true))return;
+    await saveMany(days,true);
+    for(const k of Object.keys(meta))await saveMeta(k,null);
+    if(data.meta&&typeof data.meta==='object')for(const[k,v]of Object.entries(data.meta))if(v&&typeof v==='object')await saveMeta(k,v);
+    renderIud();toast(t('imported',{n:days.length}));
+  }else{toast(t('badFile'));return}
+  refresh();
+};
+$('wipeBtn').onclick=async()=>{if(!await ask(t('deleteConfirm'),t('del'),true))return;await saveMany([],true);refresh();toast(t('wiped'))};
+
+/* ---------- App-Icon für den Home-Bildschirm ---------- */
+try{const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');
+  x.fillStyle='#000';x.fillRect(0,0,180,180);x.strokeStyle='#ff375f';x.lineWidth=14;
+  x.beginPath();x.arc(90,90,52,-Math.PI/2,Math.PI*1.25);x.stroke();
+  x.fillStyle='#ff375f';x.beginPath();x.arc(90,38,14,0,Math.PI*2);x.fill();
+  $('touchIcon').href=c.toDataURL('image/png')}catch(e){}
+
+/* ---------- Start ---------- */
+(async()=>{
+  $('sbNote').hidden=(window.self===window.top);
+  db=await openDB();if(!db)$('memNote').hidden=false;else{await loadAll();await loadMeta()}renderIud();
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  applyLang();
+})();
+</script>
+</body>
+</html>
