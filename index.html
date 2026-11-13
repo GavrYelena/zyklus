@@ -136,6 +136,18 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .strip .sq{display:flex;gap:3px;flex:1}
 .strip .sq i{width:14px;height:14px;border-radius:4px;background:var(--s2)}
 .strip .n{width:28px;text-align:right}
+.hb{display:flex;align-items:center;gap:10px;padding:4px;font-size:14px}
+.hb .l{flex:0 0 150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb .tr{flex:1;height:10px;border-radius:5px;background:var(--s2);overflow:hidden}
+.hb .tr i{display:block;height:100%;border-radius:5px}
+.hb .n{flex:0 0 34px;text-align:right;color:var(--tx2);font-variant-numeric:tabular-nums}
+.heat{width:100%;border-collapse:separate;border-spacing:3px;font-size:13px;text-align:center}
+.heat th{font-weight:400;font-size:17px;padding-bottom:2px}
+.heat td:first-child{text-align:left;width:34%;font-size:13px;line-height:1.15;overflow-wrap:anywhere;padding-right:4px}
+.heat td:not(:first-child){border-radius:7px;height:30px;font-variant-numeric:tabular-nums;background:var(--s2)}
+.stk{flex:1;display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--s2)}
+.stk i{display:block;height:100%}
+.strip .em{width:30px;flex:none;font-size:16px;text-align:center}
 .cmp{width:100%;border-collapse:collapse;font-size:15px}
 .cmp td,.cmp th{padding:9px 6px;text-align:right;border-top:.5px solid var(--sep)}
 .cmp th{font-weight:600;color:var(--tx2);font-size:13px;border-top:0}
@@ -318,7 +330,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r14';
+const BUILD='r15';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -363,7 +375,7 @@ de:{
  h_pmsSoft:'PMS im Anmarsch',f_pmsSoft:'Die Zündschnur wird kürzer. Snacks bereitlegen.',
  h_pms:'PMS',f_pms:'Dünnes Nervenkostüm. Wer dich jetzt ärgert, ist selbst schuld.',
  h_late:'{n} Tage drüber',f_late:'Die Periode lässt auf sich warten. Abwarten – oder abklären lassen.',
- prevEdit:'Bearbeiten',prevEmpty:'Nichts eingetragen',prevFc:'Prognose',updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
+ aBody:'Stimmung & Körper',aMoodTop:'Häufigste Stimmungen',aMoodPh:'Stimmung nach Phase',aPainPh:'Schmerzen nach Phase',aEnergyPh:'Energie nach Phase',aLibidoPh:'Libido nach Phase',aSex:'Sex',aSexDays:'Tage mit Sex',aUnprot:'Ungeschützt',aPerCycle:'Ø {n} pro Zyklus',aOfDays:'von {n} Tagen',aPhNote:'Anteil der Tage in der jeweiligen Phase',aFewEntries:'Noch wenige Einträge. Die Muster werden mit der Zeit klarer.',prevEdit:'Bearbeiten',prevEmpty:'Nichts eingetragen',prevFc:'Prognose',updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
  s_period:'🫖 Periode, Tag {n}. Schonmodus an. Wärmflasche und Verständnis bitte.',s_rise:'🌱 Aufwärtsphase. Energie ist zurück, Pläne willkommen.',s_fertile:'✨ Fruchtbares Fenster. Hoch-Phase, ich strahle.',s_ov:'💫 Eisprung-Tag. Peak. Staunen erlaubt.',s_luteal:'🛋️ Ruhige Phase. Sofa schlägt Party.',s_pmsSoft:'🍫 PMS im Anmarsch. Snacks bereitlegen, die Zündschnur wird kürzer.',s_pms:'⚡ PMS. Dünnes Nervenkostüm. Wer mich jetzt ärgert, ist selbst schuld.',s_late:'⏳ Die Periode ist {n} Tage drüber.',
  cycle:'Zyklus',dayShort:'Tag',todayDate:'Heute, {d}',sub:'Zykluslänge ca. {a} Tage',legFert:'Fruchtbar',stPeriod:'Periode, Tag {n}',stOv:'Eisprung heute (geschätzt)',stFertile:'Fruchtbares Fenster',stBeforeFert:'Fruchtbares Fenster {r}',stAfter:'Periode {r}',stLate:'Periode {n} Tage überfällig',cycleDay:'Zyklustag',ofAbout:'von ca. {n}',nextPeriod:'Nächste Periode',ovulation:'Eisprung',
  inDays:'in {n} Tagen',tomorrow:'morgen',todayW:'heute',late:'{n} Tage drüber',lateOne:'1 Tag drüber',ovPast:'vorbei',
@@ -410,7 +422,7 @@ ru:{
  h_pmsSoft:'ПМС на подходе',f_pmsSoft:'Фитиль становится короче. Запасись вкусняшками.',
  h_pms:'ПМС',f_pms:'Нервы на пределе. Кто сейчас злит – сам виноват.',
  h_late:'Задержка {n} дн.',f_late:'Месячные задерживаются. Подождать – или проверить.',
- prevEdit:'Изменить',prevEmpty:'Ничего не записано',prevFc:'Прогноз',updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
+ aBody:'Настроение и тело',aMoodTop:'Частые настроения',aMoodPh:'Настроение по фазам',aPainPh:'Боли по фазам',aEnergyPh:'Энергия по фазам',aLibidoPh:'Либидо по фазам',aSex:'Секс',aSexDays:'Дни с сексом',aUnprot:'Незащищённый',aPerCycle:'в среднем {n} за цикл',aOfDays:'из {n} дн.',aPhNote:'Доля дней в соответствующей фазе',aFewEntries:'Записей пока мало. Закономерности станут яснее со временем.',prevEdit:'Изменить',prevEmpty:'Ничего не записано',prevFc:'Прогноз',updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
  s_period:'🫖 Месячные, день {n}. Режим экономии. Грелку и понимание, пожалуйста.',s_rise:'🌱 Подъём. Энергия вернулась, планы приветствуются.',s_fertile:'✨ Фертильное окно. Пик формы, я сияю.',s_ov:'💫 День овуляции. Пик. Восхищаться разрешено.',s_luteal:'🛋️ Спокойная фаза. Диван лучше вечеринки.',s_pmsSoft:'🍫 ПМС на подходе. Запасай вкусняшки, фитиль становится короче.',s_pms:'⚡ ПМС. Нервы на пределе. Кто меня сейчас злит – сам виноват.',s_late:'⏳ Задержка {n} дн.',
  cycle:'Цикл',dayShort:'День',todayDate:'Сегодня, {d}',sub:'Длина цикла ~{a} дн.',legFert:'Фертильность',stPeriod:'Месячные, день {n}',stOv:'Овуляция сегодня (прогноз)',stFertile:'Фертильное окно',stBeforeFert:'Фертильное окно {r}',stAfter:'Месячные {r}',stLate:'Задержка {n} дн.',cycleDay:'День цикла',ofAbout:'из ~{n}',nextPeriod:'Следующие месячные',ovulation:'Овуляция',
  inDays:'через {n} дн.',tomorrow:'завтра',todayW:'сегодня',late:'задержка {n} дн.',lateOne:'задержка 1 день',ovPast:'прошла',
@@ -615,6 +627,63 @@ function stats(runs){
 }
 const nf=(x,d=1)=>new Intl.NumberFormat(lang,{maximumFractionDigits:d,minimumFractionDigits:0}).format(x);
 const intLabel=x=>t(FLOWS[Math.min(3,Math.max(0,Math.round(x)-1))]);
+const PH5=['period','rise','fertile','luteal','pms'];
+function phase5(r,L,d){
+  if(d<=r.dur)return'period';
+  const ovd=L-13;
+  if(d>=ovd-5&&d<=ovd+1)return'fertile';
+  if(d>L-7)return'pms';
+  return d<ovd-5?'rise':'luteal';
+}
+function bodyStats(runs,curL){
+  const o={days:{},mood:{},pain:{},energy:{},libido:{},moodTot:{},painTot:{},sex:{n:0,unprot:0},entries:0};
+  PH5.forEach(p=>{o.days[p]=0;o.mood[p]={};o.pain[p]={};o.energy[p]={low:0,ok:0,high:0};o.libido[p]={low:0,ok:0,high:0}});
+  const today=iso(new Date());
+  runs.forEach(r=>{const L=r.len!=null?r.len:curL;if(!L)return;
+    for(let d=1;d<=L;d++){const ds=addDays(r.start,d-1);if(ds>today)break;
+      const ph=phase5(r,L,d);o.days[ph]++;const x=mem.get(ds);if(!x)continue;
+      let any=false;
+      for(const k of x.moods||[]){o.mood[ph][k]=(o.mood[ph][k]||0)+1;o.moodTot[k]=(o.moodTot[k]||0)+1;any=true}
+      for(const k of x.pain||[]){o.pain[ph][k]=(o.pain[ph][k]||0)+1;o.painTot[k]=(o.painTot[k]||0)+1;any=true}
+      if(x.energy){o.energy[ph][x.energy]++;any=true}
+      if(x.libido){o.libido[ph][x.libido]++;any=true}
+      if(x.sex&&x.sex!=='none'){o.sex.n++;if(x.sex==='unprotected')o.sex.unprot++;any=true}
+      if(any)o.entries++}});
+  return o;
+}
+function bodyHtml(runs,curL){
+  const B=bodyStats(runs,curL);if(!B.entries)return'';
+  const top=(m,n)=>Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n).map(e=>e[0]);
+  const phName={period:t('legP'),rise:t('h_rise'),fertile:t('legFert'),luteal:t('h_luteal'),pms:'PMS'};
+  const phLegend='<p class="note" style="margin:8px 4px 0">'+PH5.map(p=>'<span style="white-space:nowrap">'+PH_EMO[p]+' '+phName[p]+'</span>').join(' · ')+'</p>';
+  let h='<h2 style="margin:24px 16px 0">'+t('aBody')+'</h2>';
+  if(B.entries<10)h+='<p class="note" style="margin:6px 16px 0">'+t('aFewEntries')+'</p>';
+  // häufigste Stimmungen
+  const tm=top(B.moodTot,5);
+  if(tm.length){const mx=B.moodTot[tm[0]];
+    h+='<div class="chart"><h3>'+t('aMoodTop')+'</h3>'+tm.map(k=>'<div class="hb"><span class="l">'+esc(label(k))+'</span><span class="tr"><i style="width:'+Math.max(4,B.moodTot[k]/mx*100)+'%;background:var(--mood)"></i></span><span class="n">'+B.moodTot[k]+'</span></div>').join('')+'</div>'}
+  // Heatmaps
+  const heat=(title,keys,src,rgb)=>{if(!keys.length)return'';
+    return'<div class="chart"><h3>'+title+'</h3><table class="heat"><tr><th></th>'+PH5.map(p=>'<th>'+PH_EMO[p]+'</th>').join('')+'</tr>'+
+      keys.map(k=>'<tr><td>'+esc(label(k))+'</td>'+PH5.map(p=>{const c=src[p][k]||0,dn=B.days[p],pc=dn?c/dn*100:0;
+        return'<td'+(c?' style="background:rgba('+rgb+','+(.18+Math.min(.62,pc/50*.62)).toFixed(2)+')"':'')+'>'+(c?Math.round(pc)+'%':'')+'</td>'}).join('')+'</tr>').join('')+
+      '</table>'+phLegend+'<p class="note" style="margin:4px 4px 0">'+t('aPhNote')+'</p></div>'};
+  h+=heat(t('aMoodPh'),top(B.moodTot,4),B.mood,'191,90,242');
+  h+=heat(t('aPainPh'),top(B.painTot,4),B.pain,'255,214,10');
+  // Energie / Libido gestapelt
+  const stack=(title,src,rgb)=>{const tot=PH5.reduce((a,p)=>a+src[p].low+src[p].ok+src[p].high,0);if(!tot)return'';
+    const a={low:.3,ok:.6,high:1};
+    return'<div class="chart"><h3>'+title+'</h3>'+PH5.map(p=>{const v=src[p],n=v.low+v.ok+v.high;
+      return'<div class="strip"><span class="em">'+PH_EMO[p]+'</span><span class="stk">'+(n?['low','ok','high'].map(k=>v[k]?'<i style="width:'+v[k]/n*100+'%;background:rgba('+rgb+','+a[k]+')"></i>':'').join(''):'')+'</span><span class="n">'+(n||'')+'</span></div>'}).join('')+
+      '<div class="legend" style="margin-top:10px">'+['low','ok','high'].map(k=>'<span><i style="border-radius:3px;background:rgba('+rgb+','+a[k]+')"></i>'+t(k)+'</span>').join('')+'</div></div>'};
+  h+=stack(t('aEnergyPh'),B.energy,'48,209,88');
+  h+=stack(t('aLibidoPh'),B.libido,'255,107,136');
+  // Sex
+  if(B.sex.n){const cyc=Math.max(1,runs.length);
+    h+='<div class="cards"><div class="card"><div class="t">'+t('aSexDays')+'</div><div class="v">'+B.sex.n+'</div><div class="d">'+t('aPerCycle',{n:nf(B.sex.n/cyc)})+'</div></div>'+
+      '<div class="card"><div class="t">'+t('aUnprot')+'</div><div class="v">'+B.sex.unprot+'</div><div class="d">'+t('aOfDays',{n:B.sex.n})+'</div></div></div>'}
+  return h;
+}
 function renderAnalysis(){
   document.querySelectorAll('#rangeSeg button').forEach(b=>{b.classList.toggle('on',+b.dataset.r===range);b.textContent=t(+b.dataset.r?'last12':'all')});
   const all=cycleData(),el=$('ana');
@@ -642,6 +711,7 @@ function renderAnalysis(){
     r.days.map(f=>'<i'+(f?' style="background:'+col[f]+'"':'')+'></i>').join('')+'</span><span class="n">'+r.dur+'</span></div>').join('')+
     '<div class="legend" style="margin-top:10px">'+FLOWS.map(f=>'<span><i style="border-radius:3px;background:'+col[f]+'"></i>'+t(f)+'</span>').join('')+'</div>'+
     '<p class="note" style="margin:8px 4px 0">'+t('durNote')+'</p></div>';
+  h+=bodyHtml(runs,Math.round(S.avg));
   // Spirale vorher/nachher (immer auf allen Daten)
   if(meta.iud&&meta.iud.inserted){const ins=meta.iud.inserted,b=stats(all.filter(r=>r.start<ins)),a=stats(all.filter(r=>r.start>=ins));
     if(b&&a){const row=(l,f)=>'<tr><td>'+l+'</td><td>'+f(b)+'</td><td>'+f(a)+'</td></tr>';
