@@ -38,18 +38,23 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .arrow svg{width:22px;height:22px}
 .wd,.grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
 .wd{font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px}
-.grid{row-gap:6px}
-.day{position:relative;aspect-ratio:1;display:grid;place-items:center;font-size:17px;font-variant-numeric:tabular-nums}
+.grid{row-gap:3px}
+.day{position:relative;aspect-ratio:1.12;display:grid;place-items:center;font-size:17px;font-variant-numeric:tabular-nums}
 .day .c{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;position:relative;transition:transform .1s ease-out}
 .day:active .c{transform:scale(.9)}
 .day.fut{color:var(--tx3)}
 .day.sel .c{outline:2px solid var(--acc);outline-offset:2px}
-.phd{display:flex;justify-content:space-between;align-items:baseline;margin:18px 16px 8px}
-.phd b{font-size:17px;font-weight:600}
-.phd button{color:var(--acc);font-weight:600;padding:4px 0 4px 12px}
-.prev .row{min-height:48px;padding:10px 16px}
+#dayPrev{scroll-margin-bottom:104px}
+.phd{display:flex;justify-content:space-between;align-items:center;margin:12px 16px 6px;gap:12px}
+.ptog{display:flex;align-items:center;gap:8px;min-width:0;flex:1;padding:6px 0;text-align:left}
+.ptog b{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptog svg{width:11px;height:11px;flex:none;color:var(--tx2);transition:transform .2s ease}
+.ptog.open svg{transform:rotate(90deg)}
+.phd .pedit{color:var(--acc);font-weight:600;padding:6px 0 6px 12px;flex:none}
+.psum{margin:-2px 16px 8px 35px;font-size:14px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prev .row{min-height:40px;padding:8px 16px}
 .info.prev .lt small{white-space:normal;font-size:15px;line-height:1.35;color:var(--tx);margin-top:2px;overflow-wrap:anywhere}
-.prev .rt b{font-weight:500;font-size:16px}
+.prev .rt b{font-weight:500;font-size:16px;text-align:right}
 .prev .empty{padding:16px;text-align:center;color:var(--tx2);font-size:15px}
 .day .ap{position:absolute;top:3px;right:calc(50% - 22px);width:7px;height:7px;border-radius:2px;background:var(--blue)}
 .day.today .c{box-shadow:inset 0 0 0 2px var(--tx)}
@@ -298,7 +303,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r11';
+const BUILD='r12';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -661,27 +666,31 @@ function renderCal(){
   $('grid').innerHTML=h;
   renderPrev();
 }
+let prevOpen=store.get('prevOpen')!=='0';
+function revealPrev(){const el=$('dayPrev');if(el&&$('vCal').classList.contains('on'))setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),60)}
 function renderPrev(){
   const el=$('dayPrev');if(!calSel){el.innerHTML='';return}
-  const r=getDay(calSel),rows=[];
-  const row=(k,v)=>rows.push('<div class="row"><span class="lt">'+k+'</span><span class="rt"><b>'+v+'</b></span></div>');
+  const r=getDay(calSel),rows=[],vals=[];
+  const row=(k,v,sum)=>{rows.push('<div class="row"><span class="lt">'+k+'</span><span class="rt"><b>'+v+'</b></span></div>');vals.push(sum||v)};
   const fcMap={pp:t('legP'),pf:t('legFert'),po:t('legO'),ps:'PMS'};
   if(!(r.flow)&&calPred.has(calSel))row(t('prevFc'),fcMap[calPred.get(calSel)]);
   if(r.flow)row(t('bleeding'),t(r.flow));else if(r.spotting)row(t('bleeding'),t('spotting'));
   if(r.flow&&r.spotting)row(t('spotting'),'✓');
   if(r.moods.length)row(t('mood'),r.moods.map(label).join(', '));
   if(r.pain.length)row(t('pain'),r.pain.map(label).join(', '));
-  if(r.energy)row(t('energy'),t(r.energy));
-  if(r.libido)row(t('libido'),t(r.libido));
-  if(r.sex)row(t('sex'),t(r.sex==='none'?'sexNone':r.sex));
-  if(r.appt)row(t('appt'),esc(r.appt));
-  if(r.note)rows.push('<div class="row"><span class="lt">'+t('note')+'<small>'+esc(r.note)+'</small></span></div>');
-  const dt=fmt(calSel,{weekday:'long',day:'numeric',month:'long'});
-  el.innerHTML='<div class="phd"><b>'+dt.charAt(0).toUpperCase()+dt.slice(1)+'</b><button id="prevEdit">'+t('prevEdit')+'</button></div>'+
-    '<div class="group info prev">'+(rows.length?rows.join(''):'<div class="empty">'+t('prevEmpty')+'</div>')+'</div>';
+  if(r.energy)row(t('energy'),t(r.energy),t('energy')+' '+t(r.energy).toLowerCase());
+  if(r.libido)row(t('libido'),t(r.libido),t('libido')+' '+t(r.libido).toLowerCase());
+  if(r.sex)row(t('sex'),t(r.sex==='none'?'sexNone':r.sex),t('sex'));
+  if(r.appt)row(t('appt'),esc(r.appt),t('appt'));
+  if(r.note){rows.push('<div class="row"><span class="lt">'+t('note')+'<small>'+esc(r.note)+'</small></span></div>');vals.push(t('note'))}
+  const dt=fmt(calSel,{weekday:'long',day:'numeric',month:'short'});
+  const sum=vals.length?vals.slice(0,3).join(' · ')+(vals.length>3?' · +'+(vals.length-3):''):t('prevEmpty');
+  el.innerHTML='<div class="phd"><button class="ptog'+(prevOpen?' open':'')+'" id="prevTog" aria-expanded="'+prevOpen+'"><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l8 8-8 8"/></svg><b>'+dt.charAt(0).toUpperCase()+dt.slice(1)+'</b></button><button class="pedit" id="prevEdit">'+t('prevEdit')+'</button></div>'+
+    (prevOpen?'<div class="group info prev">'+(rows.length?rows.join(''):'<div class="empty">'+t('prevEmpty')+'</div>')+'</div>':'<div class="psum">'+sum+'</div>');
+  $('prevTog').onclick=()=>{prevOpen=!prevOpen;store.set('prevOpen',prevOpen?'1':'0');renderPrev()};
   $('prevEdit').onclick=()=>openSheet(calSel);
 }
-$('grid').addEventListener('click',e=>{const b=e.target.closest('.day');if(b){calSel=b.dataset.d;renderCal()}});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.day');if(b){calSel=b.dataset.d;renderCal();revealPrev()}});
 $('prev').onclick=()=>{view.setMonth(view.getMonth()-1);renderCal()};
 $('next').onclick=()=>{view.setMonth(view.getMonth()+1);renderCal()};
 $('todayBtn').onclick=()=>{const n=new Date();view.setFullYear(n.getFullYear(),n.getMonth(),1);calSel=iso(n);renderCal();openSheet(iso(n))};
@@ -725,7 +734,7 @@ $('moodChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if
   update(r=>{r.moods=r.moods.includes(k)?r.moods.filter(x=>x!==k):[...r.moods,k]})});
 function openSheet(d){cur=d;renderSheet();$('sheet').scrollTop=0;$('sheet').classList.add('on');$('scrim').classList.add('on')}
 function closeSheet(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();const sh=$('sheet');sh.style.transform='';sh.classList.remove('on','drag');$('scrim').classList.remove('on');$('scrim').style.opacity=''}
-$('doneBtn').onclick=closeSheet;$('scrim').onclick=closeSheet;
+$('doneBtn').onclick=()=>{closeSheet();revealPrev()};$('scrim').onclick=()=>{closeSheet();revealPrev()};
 /* Sheet nach unten ziehen: 1:1, Geschwindigkeit entscheidet */
 (()=>{const sh=$('sheet'),g=$('grab');let y0=null,hist=[];
   g.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;y0=e.clientY;hist=[[e.clientY,e.timeStamp]];g.setPointerCapture(e.pointerId);sh.classList.add('drag')});
