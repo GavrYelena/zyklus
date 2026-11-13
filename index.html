@@ -57,16 +57,33 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .legend{flex-wrap:wrap;row-gap:6px}
 
 /* Zyklus */
-.ring{position:relative;width:min(340px,88vw);margin:4px auto 4px;aspect-ratio:1}
+.ring{position:relative;width:min(358px,92vw);margin:4px auto 20px;aspect-ratio:1}
 .ring svg{width:100%;height:100%;overflow:visible}
-.ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring .k{font-size:15px;color:var(--tx2);font-weight:500}
-.ring .ctr{padding:0 25%;pointer-events:none;text-align:center;gap:6px}
-.ring .st{font-size:23px;line-height:1.12;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
-.ring .fun{font-size:14px;line-height:1.3;color:var(--tx2);text-wrap:balance;min-height:2.6em}
-.ring .back{pointer-events:auto;font-size:15px;color:var(--red);font-weight:600;padding:6px 10px}
+.ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 17%;pointer-events:none;text-align:center}
+.ring .pemo{font-size:34px;line-height:1;margin-bottom:8px}
+.ring .pdate{font-size:15px;line-height:1.2;color:var(--tx2);font-weight:500}
+.ring .phead{font-size:30px;line-height:1.08;font-weight:700;letter-spacing:-.025em;text-wrap:balance;margin:8px 0 10px}
+.ring .pfun{font-size:15px;line-height:1.35;color:var(--tx2);text-wrap:balance}
+#vCyc{position:relative}
 #ringSvg{touch-action:none;cursor:pointer}
-.ring .n{font-size:76px;line-height:1;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:4px 0}
+.back{position:absolute;top:10px;right:0;padding:8px 16px;border-radius:18px;background:rgba(255,55,95,.16);color:var(--red);font-size:15px;font-weight:600;transition:transform .1s ease-out,background .1s}
+.back:active{transform:scale(.96);background:rgba(255,55,95,.28)}
+.feel{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:8px 16px 8px 10px;margin-bottom:12px;border-radius:30px;background:#3d2a1a;text-align:left;font-size:17px;font-weight:600;transition:transform .1s ease-out,background .1s}
+.feel:active{transform:scale(.98);background:#4a3320}
+.feel .fi{width:40px;height:40px;border-radius:20px;background:var(--pms);display:grid;place-items:center;flex:none}
+.feel .fi svg{width:22px;height:22px}
+.feel span.t{flex:1}
+.feel .ch{width:12px;height:20px;color:var(--pms);flex:none}
+.info .row{min-height:60px;padding:10px 16px 10px 20px;gap:14px}
+.info .row+.row::before{left:44px}
+.info .ic{width:10px;height:10px;border-radius:50%;flex:none}
+.info .ic.sq{border-radius:3px}
+.info .lt{flex:1;min-width:0;display:flex;flex-direction:column}
+.info .lt small,.info .rt small{white-space:nowrap;font-size:13px;line-height:1.3;color:var(--tx2)}
+.info .rt{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.info .rt b{font-weight:600}
+.info .rt .warn{color:var(--pms)}
+.info .rt .late{color:var(--pms)}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
 .card{background:var(--s1);border-radius:16px;padding:14px 16px}
 .card .t{font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:6px}
@@ -138,8 +155,6 @@ textarea.field{min-height:84px;resize:vertical}
 .field::placeholder{color:var(--tx3)}
 .row input[type=date],.row select{background:var(--s2);color:var(--tx);border:0;border-radius:8px;padding:6px 10px;font:inherit;font-size:16px}
 .info{margin-top:12px}
-.info .row .r{color:var(--tx2);text-align:right;font-size:15px}
-.info .row .r.warn{color:#ff9f0a}
 .switchrow{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:12px;padding:10px 14px}
 .sw{width:51px;height:31px;border-radius:16px;background:#39393d;position:relative;transition:background .2s}
 .sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15);transition:transform .25s cubic-bezier(.32,.72,0,1)}
@@ -280,7 +295,7 @@ de:{
  appt:'Gyn-Termin',apptPh:'z. B. 14:00 Krebsvorsorge',note:'Notiz',notePh:'Alles, was sonst wichtig ist',
  contraception:'Kupferspirale',iudSince:'Eingesetzt am',iudYears:'Liegedauer (Jahre)',iudHint:'Leer lassen, wenn keine Spirale liegt.',
  nextAppt:'Nächster Termin',iud:'Kupferspirale',iudIn:'seit {y}',iudDue:'Wechsel fällig {d}',iudSoon:'Wechsel in {n} Monaten',iudOver:'Wechsel überfällig',
- ym:'{y} J. {m} Mon.',
+ ym:'{y} J. {m} Mon.',ymY:'{y} J.',ymM:'{m} Mon.',iudNew:'Frisch eingesetzt',
  clueMore:' Dazu {o} weitere Einträge (Sex, Schmerzen, Energie).',
  calendar:'Kalender',settings:'Einstellungen',today:'Heute eintragen',bleeding:'Periode',spotting:'Schmierblutung',mood:'Stimmung',done:'Fertig',
  none:'Keine',light:'Leicht',medium:'Mittel',heavy:'Stark',very_heavy:'Sehr stark',
@@ -297,7 +312,7 @@ de:{
  sandboxNote:'Testversion: Datei-Download ist hier blockiert. Nutze „Als Text kopieren“.',
  storageWarn:'Speicher nicht verfügbar – Daten gehen beim Schließen verloren. Backup machen!',
  legP:'Periode',legS:'Schmierblutung',legM:'Stimmung',legF:'Periode (Prognose)',legO:'Eisprung',
- backToday:'Zurück zu heute',
+ backToday:'Zurück zu heute',howFeel:'Wie fühlst du dich heute?',
  h_period:'Periode · Tag {n}',f_period:'Schonmodus an. Wärmflasche, Schokolade, Termine absagen.',
  h_rise:'Aufwärtsphase',f_rise:'Die Energie kommt zurück. Gute Zeit für Neues, Sport und große Pläne.',
  h_fertile:'Fruchtbares Fenster',f_fertile:'Hoch-Phase. Du strahlst – und weißt es.',
@@ -325,7 +340,7 @@ ru:{
  appt:'Визит к гинекологу',apptPh:'напр. 14:00 профилактика',note:'Заметка',notePh:'Всё остальное важное',
  contraception:'Медная спираль',iudSince:'Установлена',iudYears:'Срок (лет)',iudHint:'Оставь пустым, если спирали нет.',
  nextAppt:'Следующий визит',iud:'Медная спираль',iudIn:'стоит {y}',iudDue:'замена до {d}',iudSoon:'замена через {n} мес.',iudOver:'срок замены прошёл',
- ym:'{y} г. {m} мес.',
+ ym:'{y} г. {m} мес.',ymY:'{y} г.',ymM:'{m} мес.',iudNew:'Установлена недавно',
  clueMore:' Плюс ещё {o} записей (секс, боль, энергия).',
  calendar:'Календарь',settings:'Настройки',today:'Отметить сегодня',bleeding:'Месячные',spotting:'Мажущие выделения',mood:'Настроение',done:'Готово',
  none:'Нет',light:'Слабые',medium:'Умеренные',heavy:'Обильные',very_heavy:'Очень обильные',
@@ -342,7 +357,7 @@ ru:{
  sandboxNote:'Тестовая версия: скачивание файлов здесь заблокировано. Используй «Скопировать как текст».',
  storageWarn:'Хранилище недоступно – данные пропадут при закрытии. Сделай копию!',
  legP:'Месячные',legS:'Мажущие',legM:'Настроение',legF:'Месячные (прогноз)',legO:'Овуляция',
- backToday:'Вернуться к сегодня',
+ backToday:'Вернуться к сегодня',howFeel:'Как ты себя чувствуешь сегодня?',
  h_period:'Месячные · день {n}',f_period:'Режим экономии. Грелка, шоколад, встречи отменить.',
  h_rise:'Подъём',f_rise:'Энергия возвращается. Время для нового, спорта и больших планов.',
  h_fertile:'Фертильное окно',f_fertile:'Пик формы. Ты сияешь – и сама это знаешь.',
@@ -418,13 +433,14 @@ function rel(n){return n===0?t('todayW'):n===1?t('tomorrow'):t('inDays',{n})}
 let sel=null;
 function phaseOf(d){const f=fc;if(!f)return null;
   if(d<=f.perEnd)return'period';
-  if(d>f.avg)return'late';
+  if(d>f.avg+1)return'late';
   if(d===f.ovDay)return'ov';
   if(d>=f.f1&&d<=f.f2)return'fertile';
   if(d>f.avg-7)return d<=f.avg-5?'pmsSoft':'pms';
   if(d<f.f1)return'rise';
   return'luteal';
 }
+const PH_EMO={period:'🫖',rise:'🌱',fertile:'✨',ov:'💫',luteal:'🛋️',pmsSoft:'🍫',pms:'⚡',late:'⏳'};
 const PH_COL={period:'var(--red)',fertile:'var(--ov)',ov:'var(--ov)',pms:'var(--pms)',pmsSoft:'var(--pms)',late:'#ff9f0a',rise:'#8e8e93',luteal:'#8e8e93'};
 function renderCycle(){
   fc=forecast();const el=$('cyc');
@@ -433,50 +449,51 @@ function renderCycle(){
   fc.ovDay=diff(fc.lastStart,ov)+1;fc.f1=fc.ovDay-5;fc.f2=fc.ovDay+1;
   const l=periods().pop();fc.perEnd=Math.max(diff(l.start,l.end)+1,avgDur);
   const total=fc.total=Math.max(avg,cycleDay);
-  const C=170,R=132,ang=d=>((d-0.5)/total)*2*Math.PI-Math.PI/2,P=(rad,a)=>[C+rad*Math.cos(a),C+rad*Math.sin(a)];
+  const C=170,R=146,SW=26,ang=d=>((d-0.5)/total)*2*Math.PI-Math.PI/2,P=(rad,a)=>[C+rad*Math.cos(a),C+rad*Math.sin(a)];
   const arc=(d1,d2,col,op)=>{if(d2<d1)return'';const a1=((d1-1)/total)*2*Math.PI-Math.PI/2+0.14,a2=(d2/total)*2*Math.PI-Math.PI/2-0.14;
-    const[x1,y1]=P(R,a1),[x2,y2]=P(R,a2);return'<path d="M'+x1+' '+y1+' A'+R+' '+R+' 0 '+(a2-a1>Math.PI?1:0)+' 1 '+x2+' '+y2+'" fill="none" stroke="'+col+'" stroke-width="30" stroke-linecap="round" opacity="'+op+'"/>'};
-  let dots='';
-  for(let d=1;d<=total;d++){const[x,y]=P(R-34,ang(d));
-    dots+='<circle cx="'+x+'" cy="'+y+'" r="'+(d===cycleDay?5:3.2)+'" fill="'+(d===cycleDay?'#fff':PH_COL[phaseOf(d)])+'" opacity="'+(d<cycleDay?.35:.9)+'"/>'}
-  const[ox,oy]=P(R,ang(fc.ovDay));
-  el.innerHTML='<div class="ring"><svg id="ringSvg" viewBox="0 0 340 340">'+
-    '<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="var(--s1)" stroke-width="30"/>'+
-    arc(1,Math.min(fc.perEnd,total),'var(--red)',1)+arc(Math.max(1,fc.f1),Math.min(fc.f2,avg),'var(--ov)',1)+arc(Math.max(avg-6,fc.f2+1),avg,'var(--pms)',.75)+
-    '<circle cx="'+ox+'" cy="'+oy+'" r="9" fill="#fff"/>'+dots+
-    '<g id="badge"><circle r="28" fill="var(--bg)" stroke-width="4" id="bRing"/>'+
-    '<text y="-7" text-anchor="middle" fill="var(--tx2)" font-size="10" font-weight="600">'+t('dayShort')+'</text>'+
-    '<text id="bNum" y="14" text-anchor="middle" fill="#fff" font-size="22" font-weight="700"></text></g>'+
-    '</svg><div class="ctr"><span class="k" id="cDate"></span><span class="st" id="cHead"></span><span class="fun" id="cFun"></span>'+
-    '<button class="back" id="cBack">'+t('backToday')+'</button></div></div>'+
-    '<div class="legend"><span><i style="background:var(--red)"></i>'+t('legP')+'</span><span><i style="background:var(--ov)"></i>'+t('legFert')+'</span><span><i style="background:var(--pms)"></i>PMS</span></div>'+
-    '<div class="cards">'+card(t('nextPeriod'),'var(--red)',next,diff(today,next),true)+card(t('ovulation'),'var(--ov)',ov,diff(today,ov),false)+'</div>'+
-    renderInfo()+'<p class="note" style="margin:16px 4px 0">'+t('basis',{k,n:avg})+'</p>';
+    const[x1,y1]=P(R,a1),[x2,y2]=P(R,a2);return'<path d="M'+x1+' '+y1+' A'+R+' '+R+' 0 '+(a2-a1>Math.PI?1:0)+' 1 '+x2+' '+y2+'" fill="none" stroke="'+col+'" stroke-width="'+SW+'" stroke-linecap="round" opacity="'+op+'"/>'};
+  const[ox,oy]=P(R,ang(fc.ovDay)),[tx,ty]=P(R,ang(cycleDay));
+  el.innerHTML='<div class="ring"><svg id="ringSvg" viewBox="0 0 340 340" role="img" aria-label="'+t('cycle')+'">'+
+    '<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="var(--s1)" stroke-width="'+SW+'"/>'+
+    arc(1,Math.min(fc.perEnd,total),'var(--red)',1)+arc(Math.max(1,fc.f1),Math.min(fc.f2,avg),'var(--ov)',1)+arc(Math.max(avg-6,fc.f2+1),avg,'var(--pms)',.8)+
+    '<path transform="translate('+C+' '+(C-R)+') scale(.85)" d="M0-10C-2-5-8-1-8 4a8 8 0 0 0 16 0C8-1 2-5 0-10z" fill="var(--red)"/>'+
+    '<circle cx="'+ox+'" cy="'+oy+'" r="8" fill="#fff"/><circle cx="'+ox+'" cy="'+oy+'" r="3.2" fill="var(--ov)"/>'+
+    '<circle cx="'+tx+'" cy="'+ty+'" r="6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2.5"/>'+
+    '<g id="badge"><circle r="26" fill="var(--bg)" stroke-width="4" id="bRing"/>'+
+    '<text y="-6" text-anchor="middle" fill="var(--tx2)" font-size="10" font-weight="600">'+t('dayShort')+'</text>'+
+    '<text id="bNum" y="15" text-anchor="middle" fill="#fff" font-size="22" font-weight="700"></text></g>'+
+    '</svg><div class="ctr"><span class="pemo" id="cEmo" aria-hidden="true"></span><span class="pdate" id="cDate"></span><span class="phead" id="cHead"></span><span class="pfun" id="cFun"></span></div></div>'+
+    '<button class="back" id="cBack">'+t('backToday')+'</button>'+
+    '<button class="feel" id="feelBtn"><span class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><path d="M8 14.5c1 1.4 2.3 2 4 2s3-.6 4-2"/><path d="M8.5 9.5v.5M15.5 9.5v.5"/></svg></span><span class="t">'+t('howFeel')+'</span><svg class="ch" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l8 8-8 8"/></svg></button>'+
+    renderInfo(leadRow(t('nextPeriod'),'var(--red)',next,diff(today,next),true)+leadRow(t('ovulation'),'var(--ov)',ov,diff(today,ov),false))+
+    '<p class="note" style="margin:16px 16px 0">'+t('basis',{k,n:avg})+'</p>';
   setSel(sel&&sel<=total?sel:cycleDay);
+  $('feelBtn').onclick=()=>openSheet(today);
   const svg=$('ringSvg');let dragging=false;
   const dayAt=e=>{const r=svg.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;
     const dist=Math.hypot(x,y)/(r.width/340);let a=Math.atan2(y,x)+Math.PI/2;if(a<0)a+=2*Math.PI;
     return{d:Math.min(total,Math.floor(a/(2*Math.PI)*total)+1),dist}};
-  svg.addEventListener('pointerdown',e=>{const{d,dist}=dayAt(e);if(dist<R-70||dist>R+40)return;
+  svg.addEventListener('pointerdown',e=>{const{d,dist}=dayAt(e);if(dist<R-60||dist>R+34)return;
     dragging=true;svg.setPointerCapture(e.pointerId);setSel(d);e.preventDefault()});
   svg.addEventListener('pointermove',e=>{if(dragging)setSel(dayAt(e).d)});
   const up=()=>{dragging=false};svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
   $('cBack').onclick=()=>setSel(fc.cycleDay);
-  function card(title,col,date,n,isPeriod){
-    let v,cls='';
-    if(n>=0)v=rel(n);else if(isPeriod){v=n===-1?t('lateOne'):t('late',{n:-n});cls=' late'}else v=t('ovPast');
-    return'<div class="card"><div class="t"><i style="background:'+col+'"></i>'+title+'</div><div class="v'+cls+'">'+v+'</div><div class="d">'+fmt(date,{weekday:'short',day:'numeric',month:'short'})+'</div></div>';
-  }
+}
+function leadRow(title,col,date,n,isPeriod){
+  let v,cls='';
+  if(n>=0)v=rel(n);else if(isPeriod){v=n===-1?t('lateOne'):t('late',{n:-n});cls=' late'}else v=t('ovPast');
+  return'<div class="row"><i class="ic" style="background:'+col+'"></i><span class="lt">'+title+'</span><span class="rt"><b class="'+cls.trim()+'">'+v+'</b><small>'+fmt(date,{weekday:'short',day:'numeric',month:'short'})+'</small></span></div>';
 }
 function setSel(d){
   if(!fc||!$('badge'))return;if(d===sel&&$('bNum').textContent)return;sel=d;
   const total=fc.total,a=((d-0.5)/total)*2*Math.PI-Math.PI/2;
-  $('badge').setAttribute('transform','translate('+(170+132*Math.cos(a))+' '+(170+132*Math.sin(a))+')');
+  $('badge').setAttribute('transform','translate('+(170+146*Math.cos(a))+' '+(170+146*Math.sin(a))+')');
   const ph=phaseOf(d);$('bRing').setAttribute('stroke',PH_COL[ph]);$('bNum').textContent=d;
   const date=addDays(fc.lastStart,d-1),isToday=d===fc.cycleDay;
   const ds=fmt(date,{weekday:'long',day:'numeric',month:'short'});
-  $('cDate').textContent=isToday?t('todayDate',{d:fmt(date,{day:'numeric',month:'short'})}):ds.charAt(0).toUpperCase()+ds.slice(1);
-  $('cHead').textContent=t('h_'+ph,{n:ph==='late'?d-fc.avg:d});
+  $('cEmo').textContent=PH_EMO[ph];
+  $('cDate').textContent=isToday?t('todayDate',{d:fmt(date,{day:'numeric',month:'short'})}):ds;
+  $('cHead').textContent=ph==='period'?t('legP'):t('h_'+ph,{n:ph==='late'?d-fc.avg-1:d});
   $('cFun').textContent=t('f_'+ph);
   $('cBack').style.visibility=isToday?'hidden':'visible';
 }
@@ -486,15 +503,16 @@ function iudInfo(){const m=meta.iud;if(!m||!m.inserted)return null;
   const ins=fromIso(m.inserted),now=new Date(),due=new Date(ins);due.setFullYear(due.getFullYear()+(+m.years||5));
   const mon=(now.getFullYear()-ins.getFullYear())*12+now.getMonth()-ins.getMonth()-(now.getDate()<ins.getDate()?1:0);
   const left=(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth();
-  return{since:t('ym',{y:Math.floor(mon/12),m:mon%12}),due:iso(due),left}}
-function renderInfo(){
-  const a=nextAppt(),iu=iudInfo();let h='';
+  const yy=Math.floor(mon/12),mm=mon%12;
+  return{isNew:mon<=0,since:yy&&mm?t('ym',{y:yy,m:mm}):yy?t('ymY',{y:yy}):t('ymM',{m:mm}),due:iso(due),left}}
+function renderInfo(lead){
+  const a=nextAppt(),iu=iudInfo();let h=lead||'';
   if(a){const n=diff(iso(new Date()),a.date);
-    h+='<div class="row"><span>'+t('nextAppt')+'<br><span class="note" style="margin:0">'+esc(a.appt)+'</span></span><span class="r">'+
-      fmt(a.date,{weekday:'short',day:'numeric',month:'short'})+'<br>'+rel(n)+'</span></div>'}
-  if(iu){const warn=iu.left<=6;
-    h+='<div class="row"><span>'+t('iud')+'<br><span class="note" style="margin:0">'+t('iudIn',{y:iu.since})+'</span></span><span class="r'+(warn?' warn':'')+'">'+
-      (iu.left<0?t('iudOver'):warn?t('iudSoon',{n:iu.left}):t('iudDue',{d:fmt(iu.due,{month:'long',year:'numeric'})}))+'</span></div>'}
+    h+='<div class="row"><i class="ic sq" style="background:var(--blue)"></i><span class="lt">'+t('nextAppt')+'<small>'+esc(a.appt)+'</small></span><span class="rt"><b>'+rel(n)+'</b><small>'+
+      fmt(a.date,{weekday:'short',day:'numeric',month:'short'})+'</small></span></div>'}
+  if(iu){const warn=iu.left<=6,due=!warn&&iu.left>=0;
+    h+='<div class="row"><i class="ic" style="background:var(--spot)"></i><span class="lt">'+t('iud')+'<small>'+(iu.isNew?t('iudNew'):t('iudIn',{y:iu.since}))+'</small></span><span class="rt">'+
+      (iu.left<0?'<b class="warn">'+t('iudOver')+'</b>':warn?'<b class="warn">'+t('iudSoon',{n:iu.left})+'</b>':'<b>'+fmt(iu.due,{month:'long',year:'numeric'})+'</b><small>'+t('iudDue',{d:''}).trim()+'</small>')+'</span></div>'}
   return h?'<div class="group info">'+h+'</div>':'';
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
