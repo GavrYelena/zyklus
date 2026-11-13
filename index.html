@@ -201,6 +201,11 @@ button.row:active{background:var(--s2)}
 .field{width:100%;background:var(--s2);color:var(--tx);border:0;border-radius:12px;padding:12px 14px;font:inherit;font-size:17px;outline:none}
 textarea.field{min-height:84px;resize:vertical}
 .field::placeholder{color:var(--tx3)}
+#greet{margin:-6px 0 16px}
+#greet b{display:block;font-size:20px;font-weight:600;letter-spacing:-.01em}
+#greet span{display:block;margin-top:4px;font-size:15px;line-height:1.35;color:var(--tx2)}
+.row input[type=text]{width:55%;text-align:right;background:transparent;color:var(--tx);border:0;font:inherit;font-size:17px;outline:none}
+.row input[type=text]::placeholder{color:var(--tx3)}
 .row input[type=date],.row select{background:var(--s2);color:var(--tx);border:0;border-radius:8px;padding:6px 10px;font:inherit;font-size:16px}
 .info{margin-top:12px}
 .switchrow{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:12px;padding:10px 14px}
@@ -235,6 +240,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <section class="view on" id="vCyc">
   <h1 data-t="cycle"></h1>
+  <div id="greet"></div>
   <div id="cyc"></div>
 </section>
 
@@ -261,6 +267,9 @@ textarea.field{min-height:84px;resize:vertical}
 
 <section class="view" id="vSet">
   <h1 data-t="settings"></h1>
+  <h2 data-t="personal"></h2>
+  <div class="group"><div class="row"><span data-t="yourName"></span><input type="text" id="nameIn" maxlength="30" autocomplete="off" autocapitalize="words" data-ph="namePh"></div></div>
+
   <h2 data-t="language"></h2>
   <div class="group"><div class="row"><span data-t="language"></span>
     <div class="seg" id="langSeg"><button data-l="de">DE</button><button data-l="ru">RU</button></div></div></div>
@@ -330,7 +339,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r15';
+const BUILD='r16';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -345,7 +354,7 @@ de:{
  durNote:'Perioden mit ≤ 2 erfassten Tagen zählen nicht in die Ø Dauer.',
  pain:'Schmerzen',cramps:'Krämpfe',headache:'Kopfschmerzen',breasts:'Brustspannen',back:'Rücken',
  energy:'Energie',libido:'Libido',low:'Niedrig',ok:'Normal',high:'Hoch',
- sex:'Sex',sexNone:'Keiner',protected:'Geschützt',unprotected:'Ungeschützt',
+ sex:'Sex',sexNone:'Nein',sexYes:'Ja',
  appt:'Gyn-Termin',apptPh:'z. B. 14:00 Krebsvorsorge',note:'Notiz',notePh:'Alles, was sonst wichtig ist',
  contraception:'Kupferspirale',iudSince:'Eingesetzt am',iudYears:'Liegedauer (Jahre)',iudHint:'Leer lassen, wenn keine Spirale liegt.',
  nextAppt:'Nächster Termin',iud:'Kupferspirale',iudIn:'seit {y}',iudDue:'Wechsel fällig {d}',iudSoon:'Wechsel in {n} Monaten',iudOver:'Wechsel überfällig',
@@ -354,7 +363,7 @@ de:{
  calendar:'Kalender',settings:'Einstellungen',today:'Heute eintragen',bleeding:'Periode',spotting:'Schmierblutung',mood:'Stimmung',done:'Fertig',
  none:'Keine',light:'Leicht',medium:'Mittel',heavy:'Stark',very_heavy:'Sehr stark',
  happy:'Glücklich',calm:'Ruhig',sensitive:'Empfindlich',sad:'Traurig',irritable:'Gereizt',anxious:'Ängstlich',angry:'Wütend',mood_swings:'Stimmungsschwankungen',not_in_control:'Überfordert',pms:'PMS',
- language:'Sprache',backup:'Datensicherung',export:'Backup als Datei sichern',copy:'Backup als Text kopieren',import:'Datei importieren',
+ language:'Sprache',personal:'Persönlich',yourName:'Name',namePh:'Dein Name',backup:'Datensicherung',export:'Backup als Datei sichern',copy:'Backup als Text kopieren',import:'Datei importieren',
  importHint:'Import: eigenes Backup (ersetzt alles) oder Clue-Export measurements.json (wird ergänzt).',
  deleteAll:'Alle Daten löschen',deleteConfirm:'Alle Einträge werden gelöscht. Das lässt sich nicht rückgängig machen.',
  cancel:'Abbrechen',add:'Hinzufügen',replace:'Ersetzen',del:'Löschen',
@@ -375,7 +384,7 @@ de:{
  h_pmsSoft:'PMS im Anmarsch',f_pmsSoft:'Die Zündschnur wird kürzer. Snacks bereitlegen.',
  h_pms:'PMS',f_pms:'Dünnes Nervenkostüm. Wer dich jetzt ärgert, ist selbst schuld.',
  h_late:'{n} Tage drüber',f_late:'Die Periode lässt auf sich warten. Abwarten – oder abklären lassen.',
- aBody:'Stimmung & Körper',aMoodTop:'Häufigste Stimmungen',aMoodPh:'Stimmung nach Phase',aPainPh:'Schmerzen nach Phase',aEnergyPh:'Energie nach Phase',aLibidoPh:'Libido nach Phase',aSex:'Sex',aSexDays:'Tage mit Sex',aUnprot:'Ungeschützt',aPerCycle:'Ø {n} pro Zyklus',aOfDays:'von {n} Tagen',aPhNote:'Anteil der Tage in der jeweiligen Phase',aFewEntries:'Noch wenige Einträge. Die Muster werden mit der Zeit klarer.',prevEdit:'Bearbeiten',prevEmpty:'Nichts eingetragen',prevFc:'Prognose',updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
+ aBody:'Stimmung & Körper',aMoodTop:'Häufigste Stimmungen',aMoodPh:'Stimmung nach Phase',aPainPh:'Schmerzen nach Phase',aEnergyPh:'Energie nach Phase',aLibidoPh:'Libido nach Phase',aSex:'Sex',aSexDays:'Tage mit Sex',aPerCycle:'Ø {n} pro Zyklus',aSexPh:'Meist in Phase',aPhNote:'Anteil der Tage in der jeweiligen Phase',aFewEntries:'Noch wenige Einträge. Die Muster werden mit der Zeit klarer.',prevEdit:'Bearbeiten',prevEmpty:'Nichts eingetragen',prevFc:'Prognose',updAvail:'Neue Version – tippen zum Laden',shareAria:'Lagebericht teilen',shareFail:'Teilen geht hier nicht. Text kopiert.',
  s_period:'🫖 Periode, Tag {n}. Schonmodus an. Wärmflasche und Verständnis bitte.',s_rise:'🌱 Aufwärtsphase. Energie ist zurück, Pläne willkommen.',s_fertile:'✨ Fruchtbares Fenster. Hoch-Phase, ich strahle.',s_ov:'💫 Eisprung-Tag. Peak. Staunen erlaubt.',s_luteal:'🛋️ Ruhige Phase. Sofa schlägt Party.',s_pmsSoft:'🍫 PMS im Anmarsch. Snacks bereitlegen, die Zündschnur wird kürzer.',s_pms:'⚡ PMS. Dünnes Nervenkostüm. Wer mich jetzt ärgert, ist selbst schuld.',s_late:'⏳ Die Periode ist {n} Tage drüber.',
  cycle:'Zyklus',dayShort:'Tag',todayDate:'Heute, {d}',sub:'Zykluslänge ca. {a} Tage',legFert:'Fruchtbar',stPeriod:'Periode, Tag {n}',stOv:'Eisprung heute (geschätzt)',stFertile:'Fruchtbares Fenster',stBeforeFert:'Fruchtbares Fenster {r}',stAfter:'Periode {r}',stLate:'Periode {n} Tage überfällig',cycleDay:'Zyklustag',ofAbout:'von ca. {n}',nextPeriod:'Nächste Periode',ovulation:'Eisprung',
  inDays:'in {n} Tagen',tomorrow:'morgen',todayW:'heute',late:'{n} Tage drüber',lateOne:'1 Tag drüber',ovPast:'vorbei',
@@ -392,7 +401,7 @@ ru:{
  durNote:'Месячные, где записано ≤ 2 дней, не входят в среднюю длительность.',
  pain:'Боль',cramps:'Спазмы',headache:'Головная боль',breasts:'Грудь',back:'Спина',
  energy:'Энергия',libido:'Либидо',low:'Низкая',ok:'Норма',high:'Высокая',
- sex:'Секс',sexNone:'Не было',protected:'Защищённый',unprotected:'Незащищённый',
+ sex:'Секс',sexNone:'Нет',sexYes:'Да',
  appt:'Визит к гинекологу',apptPh:'напр. 14:00 профилактика',note:'Заметка',notePh:'Всё остальное важное',
  contraception:'Медная спираль',iudSince:'Установлена',iudYears:'Срок (лет)',iudHint:'Оставь пустым, если спирали нет.',
  nextAppt:'Следующий визит',iud:'Медная спираль',iudIn:'стоит {y}',iudDue:'замена до {d}',iudSoon:'замена через {n} мес.',iudOver:'срок замены прошёл',
@@ -401,7 +410,7 @@ ru:{
  calendar:'Календарь',settings:'Настройки',today:'Отметить сегодня',bleeding:'Месячные',spotting:'Мажущие выделения',mood:'Настроение',done:'Готово',
  none:'Нет',light:'Слабые',medium:'Умеренные',heavy:'Обильные',very_heavy:'Очень обильные',
  happy:'Радость',calm:'Спокойствие',sensitive:'Чувствительность',sad:'Грусть',irritable:'Раздражение',anxious:'Тревога',angry:'Злость',mood_swings:'Перепады настроения',not_in_control:'Потеря контроля',pms:'ПМС',
- language:'Язык',backup:'Резервная копия',export:'Сохранить копию файлом',copy:'Скопировать копию как текст',import:'Импортировать файл',
+ language:'Язык',personal:'Личное',yourName:'Имя',namePh:'Твоё имя',backup:'Резервная копия',export:'Сохранить копию файлом',copy:'Скопировать копию как текст',import:'Импортировать файл',
  importHint:'Импорт: своя копия (заменяет всё) или экспорт Clue measurements.json (добавляется).',
  deleteAll:'Удалить все данные',deleteConfirm:'Все записи будут удалены. Отменить это нельзя.',
  cancel:'Отмена',add:'Добавить',replace:'Заменить',del:'Удалить',
@@ -422,7 +431,7 @@ ru:{
  h_pmsSoft:'ПМС на подходе',f_pmsSoft:'Фитиль становится короче. Запасись вкусняшками.',
  h_pms:'ПМС',f_pms:'Нервы на пределе. Кто сейчас злит – сам виноват.',
  h_late:'Задержка {n} дн.',f_late:'Месячные задерживаются. Подождать – или проверить.',
- aBody:'Настроение и тело',aMoodTop:'Частые настроения',aMoodPh:'Настроение по фазам',aPainPh:'Боли по фазам',aEnergyPh:'Энергия по фазам',aLibidoPh:'Либидо по фазам',aSex:'Секс',aSexDays:'Дни с сексом',aUnprot:'Незащищённый',aPerCycle:'в среднем {n} за цикл',aOfDays:'из {n} дн.',aPhNote:'Доля дней в соответствующей фазе',aFewEntries:'Записей пока мало. Закономерности станут яснее со временем.',prevEdit:'Изменить',prevEmpty:'Ничего не записано',prevFc:'Прогноз',updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
+ aBody:'Настроение и тело',aMoodTop:'Частые настроения',aMoodPh:'Настроение по фазам',aPainPh:'Боли по фазам',aEnergyPh:'Энергия по фазам',aLibidoPh:'Либидо по фазам',aSex:'Секс',aSexDays:'Дни с сексом',aPerCycle:'в среднем {n} за цикл',aSexPh:'Чаще всего в фазе',aPhNote:'Доля дней в соответствующей фазе',aFewEntries:'Записей пока мало. Закономерности станут яснее со временем.',prevEdit:'Изменить',prevEmpty:'Ничего не записано',prevFc:'Прогноз',updAvail:'Новая версия – нажми, чтобы обновить',shareAria:'Отправить сводку',shareFail:'Здесь не получается поделиться. Текст скопирован.',
  s_period:'🫖 Месячные, день {n}. Режим экономии. Грелку и понимание, пожалуйста.',s_rise:'🌱 Подъём. Энергия вернулась, планы приветствуются.',s_fertile:'✨ Фертильное окно. Пик формы, я сияю.',s_ov:'💫 День овуляции. Пик. Восхищаться разрешено.',s_luteal:'🛋️ Спокойная фаза. Диван лучше вечеринки.',s_pmsSoft:'🍫 ПМС на подходе. Запасай вкусняшки, фитиль становится короче.',s_pms:'⚡ ПМС. Нервы на пределе. Кто меня сейчас злит – сам виноват.',s_late:'⏳ Задержка {n} дн.',
  cycle:'Цикл',dayShort:'День',todayDate:'Сегодня, {d}',sub:'Длина цикла ~{a} дн.',legFert:'Фертильность',stPeriod:'Месячные, день {n}',stOv:'Овуляция сегодня (прогноз)',stFertile:'Фертильное окно',stBeforeFert:'Фертильное окно {r}',stAfter:'Месячные {r}',stLate:'Задержка {n} дн.',cycleDay:'День цикла',ofAbout:'из ~{n}',nextPeriod:'Следующие месячные',ovulation:'Овуляция',
  inDays:'через {n} дн.',tomorrow:'завтра',todayW:'сегодня',late:'задержка {n} дн.',lateOne:'задержка 1 день',ovPast:'прошла',
@@ -457,7 +466,8 @@ function saveMeta(key,val){if(val)meta[key]={key,...val};else delete meta[key];
     val?st.put(meta[key]):st.delete(key);x.oncomplete=res;x.onerror=res}catch(e){res()}})}
 const storeFail=()=>{db=null;$('memNote').hidden=false;toast(t('storageWarn'))};
 const isEmpty=d=>!d.flow&&!d.spotting&&!(d.moods&&d.moods.length)&&!(d.pain&&d.pain.length)&&!d.energy&&!d.libido&&!d.sex&&!d.appt&&!d.note;
-const getDay=s=>({date:s,flow:null,spotting:false,moods:[],pain:[],energy:null,libido:null,sex:null,appt:'',note:'',...(mem.get(s)||{})});
+const normSex=v=>v==='protected'||v==='unprotected'?'yes':v;
+const getDay=s=>{const r={date:s,flow:null,spotting:false,moods:[],pain:[],energy:null,libido:null,sex:null,appt:'',note:'',...(mem.get(s)||{})};r.sex=normSex(r.sex);return r};
 async function saveDay(d){
   if(isEmpty(d)){mem.delete(d.date);await tx(s=>s.delete(d.date)).catch(storeFail)}
   else{mem.set(d.date,d);await tx(s=>s.put(d)).catch(storeFail)}
@@ -636,7 +646,7 @@ function phase5(r,L,d){
   return d<ovd-5?'rise':'luteal';
 }
 function bodyStats(runs,curL){
-  const o={days:{},mood:{},pain:{},energy:{},libido:{},moodTot:{},painTot:{},sex:{n:0,unprot:0},entries:0};
+  const o={days:{},mood:{},pain:{},energy:{},libido:{},moodTot:{},painTot:{},sex:{n:0,ph:{}},entries:0};
   PH5.forEach(p=>{o.days[p]=0;o.mood[p]={};o.pain[p]={};o.energy[p]={low:0,ok:0,high:0};o.libido[p]={low:0,ok:0,high:0}});
   const today=iso(new Date());
   runs.forEach(r=>{const L=r.len!=null?r.len:curL;if(!L)return;
@@ -647,7 +657,7 @@ function bodyStats(runs,curL){
       for(const k of x.pain||[]){o.pain[ph][k]=(o.pain[ph][k]||0)+1;o.painTot[k]=(o.painTot[k]||0)+1;any=true}
       if(x.energy){o.energy[ph][x.energy]++;any=true}
       if(x.libido){o.libido[ph][x.libido]++;any=true}
-      if(x.sex&&x.sex!=='none'){o.sex.n++;if(x.sex==='unprotected')o.sex.unprot++;any=true}
+      if(normSex(x.sex)==='yes'){o.sex.n++;o.sex.ph[ph]=(o.sex.ph[ph]||0)+1;any=true}
       if(any)o.entries++}});
   return o;
 }
@@ -679,9 +689,9 @@ function bodyHtml(runs,curL){
   h+=stack(t('aEnergyPh'),B.energy,'48,209,88');
   h+=stack(t('aLibidoPh'),B.libido,'255,107,136');
   // Sex
-  if(B.sex.n){const cyc=Math.max(1,runs.length);
+  if(B.sex.n){const cyc=Math.max(1,runs.length),topPh=Object.entries(B.sex.ph).sort((a,b)=>b[1]-a[1])[0][0];
     h+='<div class="cards"><div class="card"><div class="t">'+t('aSexDays')+'</div><div class="v">'+B.sex.n+'</div><div class="d">'+t('aPerCycle',{n:nf(B.sex.n/cyc)})+'</div></div>'+
-      '<div class="card"><div class="t">'+t('aUnprot')+'</div><div class="v">'+B.sex.unprot+'</div><div class="d">'+t('aOfDays',{n:B.sex.n})+'</div></div></div>'}
+      '<div class="card"><div class="t">'+t('aSexPh')+'</div><div class="v">'+PH_EMO[topPh]+' '+phName[topPh]+'</div><div class="d">'+B.sex.ph[topPh]+'×'+'</div></div></div>'}
   return h;
 }
 function renderAnalysis(){
@@ -769,7 +779,7 @@ function renderPrev(){
   const tags=[];
   if(!r.flow&&calPred.has(calSel)){const[c,x]=fcMap[calPred.get(calSel)];tags.push(chip(c,t('prevFc')+' · '+x));vals.push(x)}
   if(r.spotting)tags.push(chip('s',t('spotting')));
-  if(r.sex){tags.push(chip(r.sex==='none'?'':'r',t('sex')+' · '+t(r.sex==='none'?'sexNone':r.sex)));vals.push(t('sex'))}
+  if(r.sex==='yes'){tags.push(chip('r',t('sex')));vals.push(t('sex'))}
   if(r.appt){tags.push(chip('b',r.appt));vals.push(t('appt'))}
   if(r.flow){const n=FLOWS.indexOf(r.flow)+1;vals.unshift(t(r.flow));
     blocks.push('<div><div class="pl">'+t('bleeding')+'</div><div class="mt">'+meter(n,4,'var(--red)')+'<b>'+t(r.flow)+'</b></div></div>')}
@@ -811,13 +821,13 @@ function renderSheet(){
   const ps=[...PAINS,...(r.pain||[]).filter(x=>!PAINS.includes(x))];
   $('painChips').innerHTML=ps.map(k=>'<button class="chip alt'+((r.pain||[]).includes(k)?' on':'')+'" data-m="'+k+'">'+label(k)+'</button>').join('');
   const one=(id,field,opts,lbl)=>$(id).innerHTML=opts.map(o=>'<button class="chip alt'+(r[field]===o?' on':'')+'" data-v="'+o+'">'+t(lbl?lbl(o):o)+'</button>').join('');
-  one('energyChips','energy',LEVELS);one('libidoChips','libido',LEVELS);one('sexChips','sex',SEXES,o=>o==='none'?'sexNone':o);
+  one('energyChips','energy',LEVELS);one('libidoChips','libido',LEVELS);one('sexChips','sex',SEXES,o=>o==='none'?'sexNone':'sexYes');
   const fut=cur>iso(new Date());$('pastSec').hidden=fut;$('noteSec').hidden=fut;
   if(document.activeElement!==$('apptIn'))$('apptIn').value=r.appt||'';
   if(document.activeElement!==$('noteIn'))$('noteIn').value=r.note||'';
   $('apptIn').placeholder=t('apptPh');$('noteIn').placeholder=t('notePh');
 }
-const PAINS=['cramps','headache','breasts','back'],LEVELS=['low','ok','high'],SEXES=['none','protected','unprotected'];
+const PAINS=['cramps','headache','breasts','back'],LEVELS=['low','ok','high'],SEXES=['none','yes'];
 async function update(fn,keep){const r=getDay(cur);const c={...r,moods:[...r.moods],pain:[...r.pain]};fn(c);
   for(const k of['energy','libido','sex'])if(!c[k])delete c[k];for(const k of['appt','note'])if(!c[k])delete c[k];if(!c.pain.length)delete c.pain;
   await saveDay(c);if(!keep)renderSheet();refresh()}
@@ -856,11 +866,26 @@ function applyLang(){
   document.documentElement.lang=lang;
   document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+  document.querySelectorAll('[data-ph]').forEach(el=>el.placeholder=t(el.dataset.ph));
+  renderGreet();
   $('todayBtn').textContent=t('today');
   $('legend').innerHTML='<span><i style="background:var(--red)"></i>'+t('legP')+'</span><span><i style="border:2px dashed var(--spot);width:8px;height:8px"></i>'+t('legS')+'</span><span><i style="background:var(--mood);width:6px;height:6px"></i>'+t('legM')+'</span><span><i style="background:#ffd60a;width:6px;height:6px"></i>'+t('pain')+'</span><span><i style="background:#30d158;width:6px;height:6px"></i>'+t('energy')+'</span><span><i style="background:#fff;width:6px;height:6px"></i>'+t('note')+'</span><span><i style="background:rgba(255,55,95,.4)"></i>'+t('legF')+'</span><span><i style="background:rgba(100,210,255,.4)"></i>'+t('legFert')+'</span><span><i style="background:rgba(255,159,10,.4)"></i>PMS</span><span><i style="background:var(--blue);border-radius:2px;width:8px;height:8px"></i>'+t('appt')+'</span>';
   refresh();if(cur)renderSheet();
 }
 $('langSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;store.set('lang',lang);applyLang()});
+
+/* ---------- Begrüßung ---------- */
+const QUOTES={de:["Multitasking ist nur ein schickes Wort für: Ich vergesse mehrere Dinge gleichzeitig.", "Kaffee ist kein Getränk. Kaffee ist eine Betriebsvoraussetzung.", "Der Montag kann nichts dafür. Er ist nur der Überbringer.", "Sei freundlich zu dir. Du hörst dir den ganzen Tag zu.", "Ich habe keine Prokrastination. Ich habe Prioritäten mit Verzögerung.", "Heute schon etwas Sinnvolles getan? Atmen zählt.", "Mein Körper ist ein Tempel. Leider einer mit wechselnden Öffnungszeiten.", "Schokolade ist kein Snack. Es ist Medizin mit Geschmack.", "Der Plan war gut. Dann kam der Tag.", "Du musst nicht alles schaffen. Nur das, was nach Feierabend noch brennt.", "Ein Tag ohne Sofa ist ein verlorener Tag.", "Wer früh aufsteht, hat mehr vom Tag. Und mehr Müdigkeit davon.", "Manche Tage laufen. Andere werden getragen. Heute wird gekrabbelt, und das ist okay.", "Ich bin nicht zickig. Ich bin hormonell gut informiert.", "Das Leben ist kurz. Iss das gute Eis zuerst.", "Perfekt ist langweilig. Du bist mindestens interessant.", "Fünf Minuten Pause sind auch ein Fortschritt.", "Mein Akku hat zwei Modi: 100 % und Decke über den Kopf.", "Nein ist ein vollständiger Satz. Ein sehr schöner sogar.", "Heute ist ein guter Tag, um Dinge auf morgen zu verschieben, die man gestern vergessen hat.", "Wasser trinken, Schultern runter, weitermachen. Mehr Weisheit gibt es nicht.", "Du bist kein Roboter. Auch wenn der Kalender das glaubt.", "Gute Laune ist auch nur schlechte Laune mit Frühstück.", "Wenn alles schiefgeht, gibt es immer noch Snacks."],
+ru:["Многозадачность — это красивое слово для «я забываю сразу несколько вещей».", "Кофе — не напиток. Кофе — условие работы.", "Понедельник ни при чём. Он просто принёс новости.", "Будь добра к себе. Ты слушаешь себя весь день.", "У меня нет прокрастинации. У меня приоритеты с задержкой.", "Сделала сегодня что-то полезное? Дыхание тоже считается.", "Моё тело — храм. Просто у него плавающий график.", "Шоколад — не перекус. Это лекарство со вкусом.", "План был хороший. Потом наступил день.", "Не надо успевать всё. Только то, что горит после работы.", "День без дивана — потерянный день.", "Кто рано встаёт, тому больше дня. И больше усталости.", "Одни дни бегут, другие несут. Сегодня ползём, и это нормально.", "Я не вредная. Я гормонально информирована.", "Жизнь коротка. Сначала ешь вкусное мороженое.", "Идеальное — скучно. Ты как минимум интересная.", "Пять минут паузы — тоже прогресс.", "У моей батарейки два режима: 100 % и плед на голову.", "«Нет» — законченное предложение. Очень красивое, кстати.", "Сегодня хороший день, чтобы отложить на завтра то, что забыла вчера.", "Попить воды, опустить плечи, идти дальше. Другой мудрости нет.", "Ты не робот. Даже если календарь думает иначе.", "Хорошее настроение — это плохое настроение после завтрака.", "Если всё идёт не так, всегда остаются вкусняшки."]};
+const GREET={de:['Guten Morgen','Guten Tag','Guten Abend','Hallo Nachteule'],ru:['Доброе утро','Добрый день','Добрый вечер','Доброй ночи']};
+function renderGreet(){
+  const n=new Date(),h=n.getHours(),g=GREET[lang],i=h>=5&&h<11?0:h>=11&&h<17?1:h>=17&&h<23?2:3;
+  const name=(store.get('name')||'').trim();
+  const pool=QUOTES[lang],q=pool[Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/864e5)%pool.length];
+  $('greet').innerHTML='<b>'+esc(g[i]+(name?', '+name:''))+'</b><span>'+esc(q)+'</span>';
+}
+$('nameIn').value=store.get('name')||'';
+$('nameIn').addEventListener('input',e=>{store.set('name',e.target.value.trim());renderGreet()});
 
 /* ---------- Dialog / Toast ---------- */
 function ask(msg,yes,danger){return new Promise(res=>{$('dlgMsg').textContent=msg;$('dlgNo').textContent=t('cancel');
@@ -906,7 +931,7 @@ function parseClue(arr){
         .forEach(o=>{if(!r.pain.includes(o))r.pain.push(o)});c.o++}
     else if(it.type==='energy'&&opts.length){const e={exhausted:'low',tired:'low',low_energy:'low',ok:'ok',fine:'ok',energized:'high',high_energy:'high'}[opts[0]];if(e){get(it.date).energy=e;c.o++}}
     else if(it.type==='sex_life'&&opts.length){const r=get(it.date);
-      for(const o of opts){if(o==='protected')r.sex='protected';else if(o==='unprotected'||o==='withdrawal')r.sex='unprotected';
+      for(const o of opts){if(o==='protected'||o==='unprotected'||o==='withdrawal')r.sex='yes';
         else if(o==='no_sex_today'&&!r.sex)r.sex='none';else if(o==='high_sex_drive')r.libido='high';else if(o==='low_sex_drive')r.libido='low'}c.o++}
   }
   return{days:[...out.values()].filter(d=>!isEmpty(d)),c};
@@ -915,7 +940,7 @@ function cleanDay(d){if(!d||typeof d.date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.tes
   const arr=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'):[],str=v=>typeof v==='string'&&v?v.slice(0,2000):undefined;
   const o={date:d.date,flow:FLOWS.includes(d.flow)?d.flow:null,spotting:!!d.spotting,moods:arr(d.moods)};
   if(arr(d.pain).length)o.pain=arr(d.pain);
-  if(LEVELS.includes(d.energy))o.energy=d.energy;if(LEVELS.includes(d.libido))o.libido=d.libido;if(SEXES.includes(d.sex))o.sex=d.sex;
+  if(LEVELS.includes(d.energy))o.energy=d.energy;if(LEVELS.includes(d.libido))o.libido=d.libido;if(SEXES.includes(normSex(d.sex)))o.sex=normSex(d.sex);
   if(str(d.appt))o.appt=str(d.appt);if(str(d.note))o.note=str(d.note);return o}
 $('importBtn').onclick=()=>{$('file').value='';$('file').click()};
 $('file').onchange=async e=>{
@@ -953,7 +978,7 @@ async function checkUpdate(){
   }catch(e){}
 }
 $('upd').onclick=()=>{location.href=location.pathname+'?v='+encodeURIComponent(updTo||Date.now())};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkUpdate();renderGreet()}});
 
 /* ---------- Start ---------- */
 (async()=>{
