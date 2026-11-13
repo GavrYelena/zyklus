@@ -12,7 +12,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <title>Zyklus</title>
 <style>
-:root{color-scheme:dark;
+@property --acc{syntax:'<color>';inherits:true;initial-value:#ff375f}
+:root{color-scheme:dark;--acc:#ff375f;transition:--acc .6s ease;
   --bg:#000;--s1:#1c1c1e;--s2:#2c2c2e;--s3:#3a3a3c;
   --tx:#fff;--tx2:rgba(235,235,245,.6);--tx3:rgba(235,235,245,.3);
   --red:#ff375f;--ov:#64d2ff;--pms:#ff9f0a;--spot:#d08a5c;--mood:#bf5af2;--blue:#0a84ff;--sep:rgba(84,84,88,.6);
@@ -21,6 +22,8 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{min-height:100vh;padding:calc(var(--st) + 8px) 16px calc(var(--sb) + 96px)}
+body{background:transparent}
+body::before{content:'';position:fixed;left:0;right:0;top:0;height:340px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 75% 100% at 50% -25%,rgba(255,55,95,.3),transparent 72%);background:radial-gradient(ellipse 75% 100% at 50% -25%,color-mix(in srgb,var(--acc) 34%,transparent),transparent 72%)}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
 .view{display:none}.view.on{display:block}
 h1{font-size:34px;line-height:1.1;letter-spacing:-.02em;font-weight:700;margin:8px 0 16px}
@@ -66,14 +69,14 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .ring .pfun{font-size:15px;line-height:1.35;color:var(--tx2);text-wrap:balance}
 #vCyc{position:relative}
 #ringSvg{touch-action:none;cursor:pointer}
-.back{position:absolute;top:10px;right:0;padding:8px 16px;border-radius:18px;background:rgba(255,55,95,.16);color:var(--red);font-size:15px;font-weight:600;transition:transform .1s ease-out,background .1s}
-.back:active{transform:scale(.96);background:rgba(255,55,95,.28)}
+.back{position:absolute;top:10px;right:0;padding:8px 16px;border-radius:18px;background:rgba(255,55,95,.16);background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);font-size:15px;font-weight:600;transition:transform .1s ease-out,background .1s}
+.back:active{transform:scale(.96);background:rgba(255,55,95,.28);background:color-mix(in srgb,var(--acc) 28%,transparent)}
 .feel{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:8px 16px 8px 10px;margin-bottom:12px;border-radius:30px;background:#3d2a1a;text-align:left;font-size:17px;font-weight:600;transition:transform .1s ease-out,background .1s}
 .feel:active{transform:scale(.98);background:#4a3320}
 .fr{display:flex;gap:10px;margin-bottom:12px}
 .fr .feel{flex:1;width:auto;min-width:0;margin-bottom:0}
-.shr{width:60px;height:60px;flex:none;border-radius:30px;background:rgba(10,132,255,.18);color:var(--blue);display:grid;place-items:center;transition:transform .1s ease-out,background .1s}
-.shr:active{transform:scale(.94);background:rgba(10,132,255,.3)}
+.shr{width:60px;height:60px;flex:none;border-radius:30px;background:rgba(255,55,95,.18);background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc);display:grid;place-items:center;transition:transform .1s ease-out,background .1s}
+.shr:active{transform:scale(.94);background:rgba(255,55,95,.3);background:color-mix(in srgb,var(--acc) 30%,transparent)}
 .shr svg{width:24px;height:24px}
 .feel .fi{width:40px;height:40px;border-radius:20px;background:var(--pms);display:grid;place-items:center;flex:none}
 .feel .fi svg{width:22px;height:22px}
@@ -111,7 +114,7 @@ h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;
 .cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--tx2)}
 .legend{display:flex;gap:16px;justify-content:center;font-size:13px;color:var(--tx2);margin:16px 0 0}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-.todaybtn{display:block;width:100%;margin-top:24px;padding:14px;border-radius:14px;background:var(--s1);color:var(--red);font-weight:600;transition:transform .1s ease-out,background .1s}
+.todaybtn{display:block;width:100%;margin-top:24px;padding:14px;border-radius:14px;background:var(--s1);color:var(--acc);font-weight:600;transition:transform .1s ease-out,background .1s}
 .todaybtn:active{transform:scale(.98);background:var(--s2)}
 
 /* Listen / Einstellungen */
@@ -134,7 +137,7 @@ button.row:active{background:var(--s2)}
   border-top:.5px solid rgba(255,255,255,.12);z-index:10}
 .tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:500;color:#8e8e93;min-width:64px;padding:2px 0}
 .tab svg{width:26px;height:26px}
-.tab.on{color:var(--red)}
+.tab.on{color:var(--acc)}
 
 /* Sheet */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
@@ -450,6 +453,8 @@ function phaseOf(d){const f=fc;if(!f)return null;
   return'luteal';
 }
 const PH_EMO={period:'🫖',rise:'🌱',fertile:'✨',ov:'💫',luteal:'🛋️',pmsSoft:'🍫',pms:'⚡',late:'⏳'};
+const PH_ACC={period:'#ff375f',rise:'#30d158',fertile:'#64d2ff',ov:'#64d2ff',luteal:'#7d7aff',pmsSoft:'#ff9f0a',pms:'#ff9f0a',late:'#ff9f0a'};
+const setAcc=ph=>document.documentElement.style.setProperty('--acc',PH_ACC[ph]||'#ff375f');
 const PH_COL={period:'var(--red)',fertile:'var(--ov)',ov:'var(--ov)',pms:'var(--pms)',pmsSoft:'var(--pms)',late:'#ff9f0a',rise:'#8e8e93',luteal:'#8e8e93'};
 function renderCycle(){
   fc=forecast();const el=$('cyc');
@@ -505,7 +510,7 @@ function setSel(d){
   if(!fc||!$('badge'))return;if(d===sel&&$('bNum').textContent)return;sel=d;
   const total=fc.total,a=((d-0.5)/total)*2*Math.PI-Math.PI/2;
   $('badge').setAttribute('transform','translate('+(170+146*Math.cos(a))+' '+(170+146*Math.sin(a))+')');
-  const ph=phaseOf(d);$('bRing').setAttribute('stroke',PH_COL[ph]);$('bNum').textContent=d;
+  const ph=phaseOf(d);setAcc(ph);$('bRing').setAttribute('stroke',PH_COL[ph]);$('bNum').textContent=d;
   const date=addDays(fc.lastStart,d-1),isToday=d===fc.cycleDay;
   const ds=fmt(date,{weekday:'long',day:'numeric',month:'short'});
   $('cEmo').textContent=PH_EMO[ph];
