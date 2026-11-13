@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Zyklus">
 <meta name="theme-color" content="#000000">
-<link rel="apple-touch-icon" id="touchIcon">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Zyklus</title>
 <style>
 :root{color-scheme:dark;
@@ -731,13 +732,6 @@ $('file').onchange=async e=>{
   refresh();
 };
 $('wipeBtn').onclick=async()=>{if(!await ask(t('deleteConfirm'),t('del'),true))return;await saveMany([],true);refresh();toast(t('wiped'))};
-
-/* ---------- App-Icon für den Home-Bildschirm ---------- */
-try{const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');
-  x.fillStyle='#000';x.fillRect(0,0,180,180);x.strokeStyle='#ff375f';x.lineWidth=14;
-  x.beginPath();x.arc(90,90,52,-Math.PI/2,Math.PI*1.25);x.stroke();
-  x.fillStyle='#ff375f';x.beginPath();x.arc(90,38,14,0,Math.PI*2);x.fill();
-  $('touchIcon').href=c.toDataURL('image/png')}catch(e){}
 
 /* ---------- Start ---------- */
 (async()=>{
