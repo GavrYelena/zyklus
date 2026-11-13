@@ -289,7 +289,7 @@ textarea.field{min-height:84px;resize:vertical}
 
 <script>
 'use strict';
-const BUILD='r9';
+const BUILD='r10';
 const FLOWS=['light','medium','heavy','very_heavy'];
 const MOODS=['happy','calm','sensitive','sad','irritable','anxious','angry','mood_swings','not_in_control','pms'];
 const I18N={
@@ -459,6 +459,30 @@ function phaseOf(d){const f=fc;if(!f)return null;
 }
 const PH_EMO={period:'🫖',rise:'🌱',fertile:'✨',ov:'💫',luteal:'🛋️',pmsSoft:'🍫',pms:'⚡',late:'⏳'};
 const PH_ACC={period:'#ff375f',rise:'#30d158',fertile:'#64d2ff',ov:'#64d2ff',luteal:'#7d7aff',pmsSoft:'#ff9f0a',pms:'#ff9f0a',late:'#ff9f0a'};
+const FUN={
+de:{
+ period:['Der Körper arbeitet. Du darfst ruhig auch mal nichts leisten.','Heute zählt nur: Sofa, Decke, Tee.','Wer heute Erwartungen an dich hat, bekommt eine Absage.','Eisen tanken. Dunkle Schokolade zählt.'],
+ rise:['Der Akku lädt. Jetzt die Aufgaben anpacken, die du seit Wochen schiebst.','Die Laune steigt von selbst. Nutz das.','Der Kopf ist klar, der Kaffee schmeckt. Los geht’s.','Das Sofa muss heute ohne dich auskommen.'],
+ fertile:['Dein Leuchten ist heute kein Zufall, sondern Hormone.','Gespräche laufen, Haut glänzt, Ideen sprudeln.','Beste Zeit für das Gespräch, vor dem du dich gedrückt hast.','Heute darfst du ruhig angeben.'],
+ ov:['Höhepunkt des Zyklus. Heute klappt, was du anfasst.','Du bist heute die Hauptfigur. Verhalte dich entsprechend.','Das Ei ist unterwegs. Die Laune sowieso: obenauf.'],
+ luteal:['Die Energie sinkt langsam. Kein Grund, es dir schwer zu machen.','Heute reicht „gut genug“.','Zeit für Serien, Suppe und frühes Schlafengehen.','Ordnung machen oder Nichtstun. Beides ist erlaubt.'],
+ pmsSoft:['Noch ist alles gut. Schokolade vorsorglich einkaufen.','Erste Vorboten. Die Welt wirkt gleich ein bisschen lauter.','Wer jetzt noch Termine plant, plant mutig.'],
+ pms:['Alles nervt, und zwar zu Recht. Zumindest heute.','Keine großen Diskussionen. Erst essen, dann reden.','Das Gefühl vergeht. Die Schokolade auch, aber sie ist da.','Heute nichts persönlich nehmen. Weder von dir noch von anderen.'],
+ late:['Der Zyklus hat Verspätung. Stress und Reisen zählen mit.','Tee, Ruhe, abwarten. Der Körper hat seinen eigenen Fahrplan.']},
+ru:{
+ period:['Тело работает. Можно спокойно ничего не успевать.','Сегодня только диван, плед и чай.','Если у кого-то есть к тебе ожидания, пусть подождёт.','Добрать железо. Тёмный шоколад считается.'],
+ rise:['Аккумулятор заряжается. Пора браться за то, что откладывала неделями.','Настроение растёт само. Пользуйся.','Голова ясная, кофе вкусный. Вперёд.','Диван сегодня справится без тебя.'],
+ fertile:['Твоё сияние сегодня не случайность, а гормоны.','Разговоры идут легко, кожа светится, идеи сыплются.','Лучшее время для разговора, которого ты избегала.','Сегодня можно и прихвастнуть.'],
+ ov:['Вершина цикла. Сегодня получается всё, за что берёшься.','Сегодня ты главная героиня. Веди себя соответственно.','Яйцеклетка в пути. Настроение тоже: на высоте.'],
+ luteal:['Энергия потихоньку падает. Не усложняй себе жизнь.','Сегодня достаточно «нормально».','Время для сериала, супа и раннего сна.','Навести порядок или ничего не делать. Можно и то, и другое.'],
+ pmsSoft:['Пока всё хорошо. Шоколад лучше купить заранее.','Первые предвестники. Мир кажется чуть громче.','Кто сейчас планирует встречи, тот смелый человек.'],
+ pms:['Всё раздражает, и вполне заслуженно. По крайней мере сегодня.','Никаких больших споров. Сначала еда, потом разговоры.','Это пройдёт. Шоколад тоже, но он рядом.','Сегодня ничего не принимать на свой счёт. Ни от себя, ни от других.'],
+ late:['Цикл опаздывает. Бывает: стресс и поездки тоже считаются.','Чай, покой, ожидание. У тела свой график.']}};
+function funLine(ph,date){
+  const pool=[t('f_'+ph),...((FUN[lang]||FUN.de)[ph]||[])];
+  const[y,m,d]=date.split('-').map(Number);
+  return pool[Math.floor(Date.UTC(y,m-1,d)/864e5)%pool.length];
+}
 const setAcc=ph=>document.documentElement.style.setProperty('--acc',PH_ACC[ph]||'#ff375f');
 const PH_COL={period:'var(--red)',fertile:'var(--ov)',ov:'var(--ov)',pms:'var(--pms)',pmsSoft:'var(--pms)',late:'#ff9f0a',rise:'#8e8e93',luteal:'#8e8e93'};
 function renderCycle(){
@@ -521,7 +545,7 @@ function setSel(d){
   $('cEmo').textContent=PH_EMO[ph];
   $('cDate').textContent=isToday?t('todayDate',{d:fmt(date,{day:'numeric',month:'short'})}):ds;
   $('cHead').textContent=ph==='period'?t('legP'):t('h_'+ph,{n:ph==='late'?d-fc.avg-1:d});
-  $('cFun').textContent=t('f_'+ph);
+  $('cFun').textContent=funLine(ph,date);
   $('cBack').style.visibility=isToday?'hidden':'visible';
 }
 function nextAppt(){const td=iso(new Date());let best=null;
